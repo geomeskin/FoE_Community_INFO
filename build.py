@@ -13,6 +13,7 @@ buildingMeta table, stores values for ALL eras, and writes index.html.
 Or pass zip paths explicitly:
     python build.py path/to/CITY1.zip path/to/CITY2.zip
 """
+"""alex comments"""
 
 import json
 import re
