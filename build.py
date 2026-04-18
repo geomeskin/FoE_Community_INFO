@@ -1049,9 +1049,9 @@ def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
     all_evts = sorted({b["evt"] for b in best_rows if b["evt"]})
     event_options = [f'    <option value="{e}">{e}</option>' for e in all_evts]
 
-    best_json       = json.dumps(best_rows,    separators=(",", ":"), ensure_ascii=False)
-    bb_json         = json.dumps(bb_rows,      separators=(",", ":"), ensure_ascii=False)
-    frags_json      = json.dumps(frag_players, separators=(",", ":"), ensure_ascii=False)
+    best_json       = json.dumps(best_rows,    separators=(",", ":"), ensure_ascii=True)
+    bb_json         = json.dumps(bb_rows,      separators=(",", ":"), ensure_ascii=True)
+    frags_json      = json.dumps(frag_players, separators=(",", ":"), ensure_ascii=True)
     era_order_json  = json.dumps(ERA_ORDER,    separators=(",", ":"))
     era_labels_json = json.dumps(ERA_LABELS,   separators=(",", ":"))
     gb_sections     = build_gb_sections(gb_players)
