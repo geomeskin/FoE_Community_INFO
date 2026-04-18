@@ -23,10 +23,12 @@ echo "============================================"
 echo ""
 
 # ── 1. Run the builder ────────────────────────────────────────────────────────
+PYTHON=$(command -v python3 || command -v python || echo "/c/Users/Alex/AppData/Local/Microsoft/WindowsApps/python3.11.exe")
+
 if [ "$#" -gt 0 ]; then
-    python3 build.py "$@"
+    "$PYTHON" build.py "$@"
 else
-    python3 build.py
+    "$PYTHON" build.py
 fi
 
 # ── 2. Confirm index.html was produced ───────────────────────────────────────
