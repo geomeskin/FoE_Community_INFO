@@ -971,10 +971,11 @@ let t4SC='pct',t4SA=false;
 function t4Init(){
   document.getElementById('t4-pills').innerHTML=FRAGS.map(p=>
     '<button class="pill'+(p.tag===t4AP?' active':'')+
-    '" onclick="t4Sel(\''+p.tag+'\',this)">'+p.tag+'</button>'
+    '" data-tag="'+p.tag+'" onclick="t4Sel(this)">'+p.tag+'</button>'
   ).join('');
 }
-function t4Sel(tag,el){
+function t4Sel(el){
+  var tag=el.dataset.tag;
   t4AP=tag;
   document.querySelectorAll('#t4-pills .pill').forEach(p=>p.classList.remove('active'));
   el.classList.add('active');
