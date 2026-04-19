@@ -1,0 +1,8 @@
+gitignore# Personal MegaExport zips — keep off GitHub
+exports/
+
+debug.html
+
+# Also common sense ignores
+*.pyc
+__pycache__/
