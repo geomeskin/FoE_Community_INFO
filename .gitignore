@@ -1,5 +1,6 @@
 gitignore# Personal MegaExport zips — keep off GitHub
 exports/
+ADMIN/
 
 debug.html
 
