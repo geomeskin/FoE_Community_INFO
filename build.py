@@ -1029,22 +1029,29 @@ t4Render();
 # HTML assembly
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
-               frag_players, sources, build_date):
-
+def _build_era_options(best_rows, highest_era_idx):
     present_idxs = set()
     for b in best_rows:
         for er in b["e"]:
             present_idxs.add(er[0])
     present_eras = [ERA_ORDER[i] for i in sorted(present_idxs)]
-
-    era_options = []
+    options = []
     for era in present_eras:
         idx = ERA_RANK[era]
         sel = " selected" if idx == highest_era_idx else ""
-        era_options.append(
-            f'      <option value="{idx}"{sel}>{ERA_LABELS[era]}</option>'
-        )
+        options.append(f'      <option value="{idx}"{sel}>{ERA_LABELS[era]}</option>')
+    return present_eras, options
+
+
+def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
+               frag_players, sources, build_date, page_title=None):
+    """
+    Build a full 4-tab page.
+    gb_players / frag_players can be the full list (shared dashboard)
+    or a single-item list (personal page).
+    page_title overrides the default <title> if provided.
+    """
+    present_eras, era_options = _build_era_options(best_rows, highest_era_idx)
 
     all_evts = sorted({b["evt"] for b in best_rows if b["evt"]})
     event_options = [f'    <option value="{e}">{e}</option>' for e in all_evts]
@@ -1056,7 +1063,10 @@ def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
     era_labels_json = json.dumps(ERA_LABELS,   separators=(",", ":"))
     gb_sections     = build_gb_sections(gb_players)
 
+    title = page_title or "FoE Community INFO"
+
     html = HTML_TEMPLATE
+    html = html.replace("FoE Community INFO</title>", f"{title}</title>", 1)
     html = html.replace("%%BUILDING_COUNT%%",  str(len(best_rows)))
     html = html.replace("%%ERA_COUNT%%",       str(len(present_eras)))
     html = html.replace("%%BUILD_DATE%%",      build_date)
@@ -1069,6 +1079,48 @@ def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
     html = html.replace("%%BB_JSON%%",         bb_json)
     html = html.replace("%%FRAGS_JSON%%",      frags_json)
     html = html.replace("%%GB_SECTIONS%%",     gb_sections)
+    return html
+
+
+def build_dashboard_html(best_rows, highest_era_idx, bb_rows,
+                         sources, build_date):
+    """
+    Shared community dashboard — Tabs 1 & 2 only, no personal data.
+    Tabs 3 & 4 show a friendly 'no personal data' message.
+    """
+    present_eras, era_options = _build_era_options(best_rows, highest_era_idx)
+    all_evts = sorted({b["evt"] for b in best_rows if b["evt"]})
+    event_options = [f'    <option value="{e}">{e}</option>' for e in all_evts]
+
+    best_json       = json.dumps(best_rows, separators=(",", ":"), ensure_ascii=True)
+    bb_json         = json.dumps(bb_rows,   separators=(",", ":"), ensure_ascii=True)
+    era_order_json  = json.dumps(ERA_ORDER,  separators=(",", ":"))
+    era_labels_json = json.dumps(ERA_LABELS, separators=(",", ":"))
+
+    no_personal = (
+        '<div style="padding:40px;text-align:center;color:var(--text3);'
+        'font-family:\'Share Tech Mono\',monospace;font-size:.85rem;">'
+        '&#128274; Personal data not included in the community dashboard.<br>'
+        '<span style="color:var(--text2);font-size:.8rem;">'
+        'Players with a personal page can find their GB and fragment data there.</span>'
+        '</div>'
+    )
+
+    html = HTML_TEMPLATE
+    html = html.replace("FoE Community INFO</title>",
+                        "FoE Community INFO \u2014 Guild Dashboard</title>", 1)
+    html = html.replace("%%BUILDING_COUNT%%",  str(len(best_rows)))
+    html = html.replace("%%ERA_COUNT%%",       str(len(present_eras)))
+    html = html.replace("%%BUILD_DATE%%",      build_date)
+    html = html.replace("%%DATA_SOURCES%%",    " + ".join(sources))
+    html = html.replace("%%ERA_OPTIONS%%",     "\n".join(era_options))
+    html = html.replace("%%EVENT_OPTIONS%%",   "\n".join(event_options))
+    html = html.replace("%%ERA_ORDER_JSON%%",  era_order_json)
+    html = html.replace("%%ERA_LABELS_JSON%%", era_labels_json)
+    html = html.replace("%%BEST_JSON%%",       best_json)
+    html = html.replace("%%BB_JSON%%",         bb_json)
+    html = html.replace("%%FRAGS_JSON%%",      "[]")
+    html = html.replace("%%GB_SECTIONS%%",     no_personal)
     return html
 
 
@@ -1094,6 +1146,7 @@ def main():
     print(f"{'─'*44}")
     print(f"Processing {len(zip_paths)} export(s):\n")
 
+    # ── Shared data (all zips merged) ─────────────────────────────────────────
     best_rows, highest_era_idx = build_best_list(zip_paths)
 
     bb_csv  = find_battle_boost_csv(script_dir)
@@ -1106,38 +1159,64 @@ def main():
         print(f"         Place *BattleBoost*.csv next to build.py.")
 
     print()
-    gb_players = build_gb_data(zip_paths)
+    gb_players   = build_gb_data(zip_paths)
     print()
     frag_players = build_fragment_data(zip_paths)
 
-    sources = []
+    # Tag each zip with its player name
+    tagged_zips = []
     for zp in zip_paths:
         m = re.match(r"([A-Z]+)_foe_helper", zp.name)
-        sources.append(m.group(1) if m else zp.stem)
+        tag = m.group(1) if m else zp.stem
+        tagged_zips.append((tag, zp))
 
-    now = datetime.now(timezone.utc)
+    sources    = [tag for tag, _ in tagged_zips]
+    now        = datetime.now(timezone.utc)
     build_date = f"{now.day} {now.strftime('%b %Y')}"
 
-    print(f"\n  Assembling HTML...")
-    html = build_html(
-        best_rows, highest_era_idx,
-        bb_rows, gb_players, frag_players,
-        sources, build_date,
+    written = []
+
+    # ── 1. Shared community dashboard ─────────────────────────────────────────
+    print(f"\n  Building shared dashboard (index.html)...")
+    dash_html = build_dashboard_html(
+        best_rows, highest_era_idx, bb_rows, sources, build_date
     )
+    dash_path = script_dir / "index.html"
+    dash_path.write_text(dash_html, encoding="utf-8")
+    written.append(dash_path)
+    print(f"    -> {dash_path.name}  ({dash_path.stat().st_size/1024:.1f} KB)")
 
-    out_path = script_dir / "index.html"
-    out_path.write_text(html, encoding="utf-8")
+    # ── 2. Per-player personal pages ──────────────────────────────────────────
+    print(f"\n  Building personal pages...")
+    for tag, zp in tagged_zips:
+        # Filter GB and fragment data to just this player
+        player_gbs   = [p for p in gb_players   if p["tag"] == tag]
+        player_frags = [p for p in frag_players  if p["tag"] == tag]
 
-    size_kb = out_path.stat().st_size / 1024
+        # Get this player's era for the title
+        era_label = player_gbs[0]["era"] if player_gbs else ""
+        player_name = player_gbs[0]["player"] if player_gbs else tag
+        page_title = f"{player_name} \u2014 FoE Community INFO"
+
+        player_html = build_html(
+            best_rows, highest_era_idx,
+            bb_rows, player_gbs, player_frags,
+            [tag], build_date,
+            page_title=page_title,
+        )
+        out_path = script_dir / f"{tag}.html"
+        out_path.write_text(player_html, encoding="utf-8")
+        written.append(out_path)
+        print(f"    -> {out_path.name}  ({out_path.stat().st_size/1024:.1f} KB)"
+              f"  [{player_name} / {era_label}]")
+
+    # ── Summary ───────────────────────────────────────────────────────────────
     print(f"\n{'─'*44}")
-    print(f"  Written  : {out_path}")
-    print(f"  Size     : {size_kb:.1f} KB")
-    print(f"  Tab 1    : {len(best_rows)} boost buildings")
-    print(f"  Tab 2    : {len(bb_rows)} battle boost entries")
-    print(f"  Tab 3    : {len(gb_players)} player(s)")
-    print(f"  Tab 4    : {len(frag_players)} player(s)")
-    print(f"  Sources  : {', '.join(sources)}")
-    print(f"  Built    : {build_date}")
+    print(f"  Files written : {len(written)}")
+    print(f"  Tab 1         : {len(best_rows)} boost buildings")
+    print(f"  Tab 2         : {len(bb_rows)} battle boost entries")
+    print(f"  Players       : {', '.join(sources)}")
+    print(f"  Built         : {build_date}")
     print()
 
 
