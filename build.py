@@ -293,6 +293,18 @@ def find_battle_boost_csv(script_dir):
 
 def extract_gb_data(zip_path):
     with zipfile.ZipFile(zip_path) as zf:
+        # Get current_player_id from localStorage first
+        current_player_id = None
+        ls_files = [f for f in zf.namelist() if "localStorage" in f and f.endswith(".json")]
+        if ls_files:
+            try:
+                ls = json.loads(zf.read(ls_files[0]))
+                pid = ls.get("current_player_id")
+                if pid:
+                    current_player_id = int(pid)
+            except Exception:
+                pass
+
         gms_files = [f for f in zf.namelist()
                      if "GuildMemberStat" in f and f.endswith(".json")]
         if not gms_files:
@@ -318,10 +330,17 @@ def extract_gb_data(zip_path):
                 gbs_raw = json.loads(gbs_raw)
             except Exception:
                 gbs_raw = []
+        p["_gbs_parsed"] = gbs_raw
+
+        # Prefer player matching current_player_id from localStorage
+        if current_player_id and p.get("player_id") == current_player_id:
+            best_player = p
+            break
+
+        # Fallback: player with most GBs
         if len(gbs_raw) > best_gb_count:
             best_gb_count = len(gbs_raw)
             best_player = p
-            best_player["_gbs_parsed"] = gbs_raw
 
     if not best_player:
         return None
@@ -436,7 +455,19 @@ def extract_fragment_data(zip_path):
         if not db_files:
             return None
 
-        # Pick the DB with the most statsRewards rows (primary player)
+        # Get current_player_id from localStorage
+        current_player_id = None
+        ls_files = [f for f in zf.namelist() if "localStorage" in f and f.endswith(".json")]
+        if ls_files:
+            try:
+                ls = json.loads(zf.read(ls_files[0]))
+                pid = ls.get("current_player_id")
+                if pid:
+                    current_player_id = int(pid)
+            except Exception:
+                pass
+
+        # Pick the DB matching current_player_id, fallback to most statsRewards rows
         best_file = None
         best_count = -1
         for fname in db_files:
@@ -444,6 +475,10 @@ def extract_fragment_data(zip_path):
                 data = json.loads(zf.read(fname))
             except Exception:
                 continue
+            # Check if this DB belongs to the current player
+            if current_player_id and str(current_player_id) in fname:
+                best_file = fname
+                break
             tables = data.get("data", {}).get("data", [])
             sr = next((t for t in tables if t.get("tableName") == "statsRewards"), None)
             count = len(sr["rows"]) if sr else 0
