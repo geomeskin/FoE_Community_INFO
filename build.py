@@ -867,7 +867,7 @@ tr:hover td{background:rgba(59,130,246,.04);}
     <span class="badge gold">%%BUILDING_COUNT%% Buildings</span>
     <span class="badge teal">%%ERA_COUNT%% Eras</span>
     <span class="badge green">Updated %%BUILD_DATE%%</span>
-    <span class="badge blue">%%DATA_SOURCES%%</span>
+    <span class="badge blue">%%NAV_LINKS%%</span>
   </div>
 </div>
 
@@ -1386,7 +1386,6 @@ def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
     html = html.replace("%%BUILDING_COUNT%%",  str(len(best_rows)))
     html = html.replace("%%ERA_COUNT%%",       str(len(present_eras)))
     html = html.replace("%%BUILD_DATE%%",      build_date)
-    html = html.replace("%%DATA_SOURCES%%",    "%%NAV_LINKS%%")
     html = html.replace("%%ERA_OPTIONS%%",     "\n".join(era_options))
     html = html.replace("%%EVENT_OPTIONS%%",   "\n".join(event_options))
     html = html.replace("%%ERA_ORDER_JSON%%",  era_order_json)
@@ -1430,7 +1429,6 @@ def build_dashboard_html(best_rows, highest_era_idx, bb_rows,
     html = html.replace("%%BUILDING_COUNT%%",  str(len(best_rows)))
     html = html.replace("%%ERA_COUNT%%",       str(len(present_eras)))
     html = html.replace("%%BUILD_DATE%%",      build_date)
-    html = html.replace("%%DATA_SOURCES%%",    "%%NAV_LINKS%%")
     html = html.replace("%%ERA_OPTIONS%%",     "\n".join(era_options))
     html = html.replace("%%EVENT_OPTIONS%%",   "\n".join(event_options))
     html = html.replace("%%ERA_ORDER_JSON%%",  era_order_json)
