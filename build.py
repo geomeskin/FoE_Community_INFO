@@ -78,7 +78,7 @@ EVENT_MAP = {
     "ANNI": "Anniversary",
     "GR":   "Guild Raids",
     "FELL": "Fellowship Event",
-    "HIS":  "Historical Quest",
+    "HIS":  "History Event",
     "CUP":  "Soccer/Cup Event",
     "GBG":  "Guild Battlegrounds",
     "BOWL": "Football/Bowl Event",
@@ -891,6 +891,12 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <strong>Frags/Day</strong> = historical fragment accumulation rate from GEx, quests &amp; events (excludes shop purchases). Divide Need by this to estimate days remaining.
   <strong>Est. Days</strong> and <strong>Est. Date</strong> are based on that rate.
   In-progress items shown first.
+</div>
+<div class="info-box" style="border-left-color:var(--orange);margin-top:8px;">
+  <strong>\u26a0\ufe0f Known data limitations:</strong>
+  Fragments purchased in the <strong>QI Shop</strong> are not recorded in the FoE Helper export and will not appear here.
+  Likewise, <strong>QI Seasonal Kit</strong> fragment balances (e.g. QI Spring/Summer/Autumn Epic Selection Kits) are not captured.
+  If your in-game inventory shows fragment counts that don\u2019t match this tracker, QI shop purchases are the likely cause.
 </div>
 <div class="player-pills" id="t4-pills"></div>
 <div class="toolbar">
