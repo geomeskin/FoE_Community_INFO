@@ -1430,7 +1430,11 @@ def build_dashboard_html(best_rows, highest_era_idx, bb_rows,
     html = html.replace("%%BUILDING_COUNT%%",  str(len(best_rows)))
     html = html.replace("%%ERA_COUNT%%",       str(len(present_eras)))
     html = html.replace("%%BUILD_DATE%%",      build_date)
-    html = html.replace("%%DATA_SOURCES%%",    " + ".join(sources))
+    source_links = " + ".join(
+        f'<a href="{tag}.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">{tag}</a>'
+        for tag in sources
+    )
+    html = html.replace("%%DATA_SOURCES%%",    source_links)
     html = html.replace("%%ERA_OPTIONS%%",     "\n".join(era_options))
     html = html.replace("%%EVENT_OPTIONS%%",   "\n".join(event_options))
     html = html.replace("%%ERA_ORDER_JSON%%",  era_order_json)
