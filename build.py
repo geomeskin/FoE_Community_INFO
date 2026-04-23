@@ -22,10 +22,11 @@ Outputs a single index.html with four tabs:
 
 import csv
 import json
+import math
 import re
 import sys
 import zipfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # ── Era definitions ───────────────────────────────────────────────────────────
@@ -519,19 +520,43 @@ def extract_fragment_data(zip_path):
                 "type": assembled.get("type", ""),
             }
 
-    # Tally received and assembled
+    # Tally received and assembled; also track daily rate per item.
+    # Exclude item_store (manual purchases) from rate — they skew the passive rate.
+    EXCLUDE_FROM_RATE = {"item_store"}
+
     frags_in = {}
     assembled_count = {}
+    frags_for_rate = {}  # item_id -> total frags from passive sources
+    sources_by_item = {}  # item_id -> {type -> total frags}
     for r in rewards:
         rwd = r.get("reward", "")
         amt = r.get("amount", 0)
+        rtype = r.get("type", "unknown")
         if rwd.startswith("fragment#"):
             parts = rwd.split("#")
             if len(parts) >= 2:
                 item_id = parts[1]
                 frags_in[item_id] = frags_in.get(item_id, 0) + amt
-        elif r.get("type") == "inventory_item" and rwd:
+                if rtype not in EXCLUDE_FROM_RATE:
+                    frags_for_rate[item_id] = frags_for_rate.get(item_id, 0) + amt
+                if item_id not in sources_by_item:
+                    sources_by_item[item_id] = {}
+                sources_by_item[item_id][rtype] = sources_by_item[item_id].get(rtype, 0) + amt
+        elif rtype == "inventory_item" and rwd:
             assembled_count[rwd] = assembled_count.get(rwd, 0) + amt
+
+    # Compute span of statsRewards data (in days) for rate calculation
+    dates = [r["date"] for r in rewards if r.get("date")]
+    span_days = 0.0
+    if len(dates) >= 2:
+        span_days = (max(dates) - min(dates)) / (1000 * 86400)
+
+    fpd_by_item = {}
+    if span_days > 0:
+        for item_id, total in frags_for_rate.items():
+            fpd_by_item[item_id] = round(total / span_days, 2)
+
+    today = datetime.now(timezone.utc)
 
     # Build rows
     frag_rows = []
@@ -542,9 +567,19 @@ def extract_fragment_data(zip_path):
         total_in  = frags_in.get(item_id, 0)
         kits_made = assembled_count.get(item_id, 0)
         spent     = kits_made * meta["req"]
-        balance   = total_in - spent
+        # Negative balance means statsRewards history predates some assemblies.
+        # Clamp to 0 — treat as "starting fresh" rather than showing nonsense negatives.
+        balance   = max(total_in - spent, 0)
         req       = meta["req"]
         pct       = round(balance / req * 100, 1) if req else 0
+
+        fpd  = fpd_by_item.get(item_id, 0.0)
+        days = None
+        est  = None
+        if fpd > 0 and balance < req:
+            days = math.ceil((req - balance) / fpd)
+            est  = (today + timedelta(days=days)).strftime("%Y-%m-%d")
+
         frag_rows.append({
             "name":        meta["name"],
             "item_id":     item_id,
@@ -552,8 +587,11 @@ def extract_fragment_data(zip_path):
             "need":        req,
             "pct":         pct,
             "assembled":   kits_made,
-            "in_progress": 0 < balance < req,
+            "in_progress": balance < req and (balance > 0 or fpd > 0),
             "complete":    balance >= req,
+            "fpd":         fpd,
+            "days":        days,
+            "est":         est,
         })
 
     # Sort: in-progress (pct desc), complete, zero
@@ -849,8 +887,10 @@ tr:hover td{background:rgba(59,130,246,.04);}
 <!-- TAB 4 ─────────────────────────────────────────────────────────────────── -->
 <div id="t4" class="tab-panel">
 <div class="info-box">
-  <strong>Fragment Tracker</strong> \u2014 fragments received minus assembled \xd7 required = current balance.
-  In-progress items shown first. Completed items (balance \u2265 required) shown below.
+  <strong>Fragment Tracker</strong> \u2014 balance = received \u2212 assembled \xd7 required.
+  <strong>Frags/Day</strong> = historical fragment accumulation rate from GEx, quests &amp; events (excludes shop purchases). Divide Need by this to estimate days remaining.
+  <strong>Est. Days</strong> and <strong>Est. Date</strong> are based on that rate.
+  In-progress items shown first.
 </div>
 <div class="player-pills" id="t4-pills"></div>
 <div class="toolbar">
@@ -869,6 +909,9 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <th onclick="t4ColSort('have')">HAVE</th>
   <th onclick="t4ColSort('need')">NEED</th>
   <th onclick="t4ColSort('assembled')">ASSEMBLED</th>
+  <th onclick="t4ColSort('fpd')">FRAGS/DAY</th>
+  <th onclick="t4ColSort('days')">EST. DAYS</th>
+  <th>EST. DATE</th>
 </tr></thead>
 <tbody id="t4-tbody"></tbody>
 </table></div>
@@ -1029,6 +1072,11 @@ function t4Render(){
   });
   rows=[...rows].sort((a,b)=>{
     if(t4SC==='name')return t4SA?a.name.localeCompare(b.name):b.name.localeCompare(a.name);
+    if(t4SC==='days'){
+      const av=a.days!=null?a.days:Infinity;
+      const bv=b.days!=null?b.days:Infinity;
+      return t4SA?av-bv:bv-av;
+    }
     return t4SA?(a[t4SC]||0)-(b[t4SC]||0):(b[t4SC]||0)-(a[t4SC]||0);
   });
   document.getElementById('t4-count').textContent=rows.length+' items';
@@ -1040,16 +1088,26 @@ function t4Render(){
     const pctL='<span class="pct-label" style="color:'+col+'">'+r.pct+'%</span>';
     const haveL='<span class="v '+(r.in_progress?'v-gold':'')+'">'+r.have.toLocaleString()+'</span>';
     const asmL=r.assembled>0?'<span class="v v-green">'+r.assembled+'\xd7</span>':'<span class="zero">\u2014</span>';
+    const fpd=r.fpd||0;
+    const fpdL=fpd>0?'<span class="v v-teal">'+fpd.toFixed(2)+'</span>':'<span class="zero">\u2014</span>';
+    const dc=r.days!=null?r.days:null;
+    const dcCol=dc==null?'zero':dc<30?'v-green':dc<180?'v-gold':'v-att';
+    const daysL=dc!=null?'<span class="v '+dcCol+'">'+dc+'d</span>':'<span class="zero">\u2014</span>';
+    const estL=r.est?'<span class="v" style="font-size:.75rem;color:var(--text2)">'+r.est+'</span>':'<span class="zero">\u2014</span>';
     return'<tr>'
       +'<td class="bn">'+r.name+'</td>'
       +'<td>'+bar+pctL+'</td>'
       +'<td>'+haveL+'</td>'
       +'<td><span class="v">'+r.need.toLocaleString()+'</span></td>'
-      +'<td>'+asmL+'</td></tr>';
+      +'<td>'+asmL+'</td>'
+      +'<td>'+fpdL+'</td>'
+      +'<td>'+daysL+'</td>'
+      +'<td>'+estL+'</td></tr>';
   }).join('');
 }
 function t4ColSort(c){
-  if(t4SC===c)t4SA=!t4SA;else{t4SC=c;t4SA=false;}
+  if(t4SC===c)t4SA=!t4SA;
+  else{t4SC=c;t4SA=(c==='days');} // days: default ascending (soonest first)
   t4Render();
 }
 t4Init();

@@ -124,7 +124,7 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <div class="badges">
     <span class="badge gold">722 Buildings</span>
     <span class="badge teal">22 Eras</span>
-    <span class="badge green">Updated 20 Apr 2026</span>
+    <span class="badge green">Updated 22 Apr 2026</span>
     <span class="badge blue">PMTHS</span>
   </div>
 </div>
@@ -344,8 +344,10 @@ tr:hover td{background:rgba(59,130,246,.04);}
 <!-- TAB 4 ─────────────────────────────────────────────────────────────────── -->
 <div id="t4" class="tab-panel">
 <div class="info-box">
-  <strong>Fragment Tracker</strong> — fragments received minus assembled × required = current balance.
-  In-progress items shown first. Completed items (balance ≥ required) shown below.
+  <strong>Fragment Tracker</strong> — balance = received − assembled × required.
+  <strong>Frags/Day</strong> = historical fragment accumulation rate from GEx, quests &amp; events (excludes shop purchases). Divide Need by this to estimate days remaining.
+  <strong>Est. Days</strong> and <strong>Est. Date</strong> are based on that rate.
+  In-progress items shown first.
 </div>
 <div class="player-pills" id="t4-pills"></div>
 <div class="toolbar">
@@ -364,6 +366,9 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <th onclick="t4ColSort('have')">HAVE</th>
   <th onclick="t4ColSort('need')">NEED</th>
   <th onclick="t4ColSort('assembled')">ASSEMBLED</th>
+  <th onclick="t4ColSort('fpd')">FRAGS/DAY</th>
+  <th onclick="t4ColSort('days')">EST. DAYS</th>
+  <th>EST. DATE</th>
 </tr></thead>
 <tbody id="t4-tbody"></tbody>
 </table></div>
@@ -494,7 +499,7 @@ function t2ColSort(c){
 t2Render();
 
 // ══════════════════════════════════════════════════════════════ TAB 4
-const FRAGS=[{"tag":"PMTHS","fragments":[{"name":"Neo Colossus Selection Kit","item_id":"selection_kit_neo_colossus","have":400,"need":1000,"pct":40.0,"assembled":1,"in_progress":true,"complete":false},{"name":"Feathered Serpent Statue Selection Kit","item_id":"selection_kit_feathered_serpent_statue","have":70,"need":200,"pct":35.0,"assembled":0,"in_progress":true,"complete":false},{"name":"Renovation Kit","item_id":"renovation_kit","have":10,"need":30,"pct":33.3,"assembled":2,"in_progress":true,"complete":false},{"name":"Shrine of Knowledge","item_id":"building_shrine_of_knowledge","have":3,"need":15,"pct":20.0,"assembled":0,"in_progress":true,"complete":false},{"name":"Boo\u2019loon Masquerade Carnival Silver Upgrade Kit","item_id":"silver_upgrade_kit_HAL25A","have":25,"need":150,"pct":16.7,"assembled":0,"in_progress":true,"complete":false},{"name":"Fountain of Youth","item_id":"building_fountain_of_youth","have":94,"need":800,"pct":11.8,"assembled":0,"in_progress":true,"complete":false},{"name":"Greater Ritual Flame","item_id":"building_greater_ritual_flame","have":10,"need":100,"pct":10.0,"assembled":0,"in_progress":true,"complete":false},{"name":"Somerset Hospital Selection Kit","item_id":"selection_kit_GBG25E","have":525,"need":7500,"pct":7.0,"assembled":0,"in_progress":true,"complete":false},{"name":"Fountain Of Youth Shrink Kit","item_id":"shrink_kit_fountain_of_youth","have":19,"need":800,"pct":2.4,"assembled":0,"in_progress":true,"complete":false},{"name":"Neo Bazaar Selection Kit","item_id":"selection_kit_GR25C","have":0,"need":1000,"pct":0.0,"assembled":8,"in_progress":false,"complete":false},{"name":"Forgotten Temple - Active","item_id":"building_forgotten_temple","have":-15,"need":200,"pct":-7.5,"assembled":1,"in_progress":false,"complete":false},{"name":"QI Autumn 2025 Epic Selection Kit","item_id":"selection_kit_epic_GR25_3","have":-200,"need":1000,"pct":-20.0,"assembled":1,"in_progress":false,"complete":false},{"name":"Guild Expedition 4 Kit","item_id":"selection_kit_gex4","have":-25,"need":100,"pct":-25.0,"assembled":2,"in_progress":false,"complete":false},{"name":"Guild Expedition 1 Kit","item_id":"selection_kit_gex1","have":-25,"need":100,"pct":-25.0,"assembled":1,"in_progress":false,"complete":false},{"name":"Guild Expedition 2 Kit","item_id":"selection_kit_gex2","have":-25,"need":100,"pct":-25.0,"assembled":1,"in_progress":false,"complete":false},{"name":"Guild Expedition 3 Kit","item_id":"selection_kit_gex3","have":-25,"need":100,"pct":-25.0,"assembled":1,"in_progress":false,"complete":false},{"name":"Wishing Well Shrink Kit","item_id":"shrink_kit_wishing_well","have":-7,"need":15,"pct":-46.7,"assembled":1,"in_progress":false,"complete":false},{"name":"Eternal Market Platinum Selection Kit","item_id":"platinum_selection_kit_LTE24A","have":-550,"need":1000,"pct":-55.0,"assembled":1,"in_progress":false,"complete":false},{"name":"Shrine of Knowledge Upgrade","item_id":"upgrade_kit_shrine_of_knowledge","have":-9,"need":15,"pct":-60.0,"assembled":1,"in_progress":false,"complete":false},{"name":"Feathered Serpent Statue Chain Kit","item_id":"selection_kit_feathered_serpent_statue_chain","have":-60,"need":100,"pct":-60.0,"assembled":1,"in_progress":false,"complete":false},{"name":"Divine Sky Watch","item_id":"building_divine_sky_watch","have":-100,"need":120,"pct":-83.3,"assembled":1,"in_progress":false,"complete":false},{"name":"Wishing Well","item_id":"building_wishing_well","have":-13,"need":15,"pct":-86.7,"assembled":1,"in_progress":false,"complete":false},{"name":"Shajar al-Durr","item_id":"ally#shajar_al_durr#rare#1","have":-1000,"need":1000,"pct":-100.0,"assembled":1,"in_progress":false,"complete":false},{"name":"One Up Kit","item_id":"one_up_kit","have":-130,"need":30,"pct":-433.3,"assembled":6,"in_progress":false,"complete":false},{"name":"Store Building","item_id":"store_building","have":-135,"need":15,"pct":-900.0,"assembled":10,"in_progress":false,"complete":false}]}];
+const FRAGS=[{"tag":"PMTHS","fragments":[{"name":"Neo Colossus Selection Kit","item_id":"selection_kit_neo_colossus","have":400,"need":1000,"pct":40.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Feathered Serpent Statue Selection Kit","item_id":"selection_kit_feathered_serpent_statue","have":70,"need":200,"pct":35.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.39,"days":334,"est":"2027-03-22"},{"name":"Renovation Kit","item_id":"renovation_kit","have":10,"need":30,"pct":33.3,"assembled":2,"in_progress":true,"complete":false,"fpd":0.39,"days":52,"est":"2026-06-13"},{"name":"Shrine of Knowledge","item_id":"building_shrine_of_knowledge","have":3,"need":15,"pct":20.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.02,"days":600,"est":"2027-12-13"},{"name":"Boo\u2019loon Masquerade Carnival Silver Upgrade Kit","item_id":"silver_upgrade_kit_HAL25A","have":25,"need":150,"pct":16.7,"assembled":0,"in_progress":true,"complete":false,"fpd":0.14,"days":893,"est":"2028-10-01"},{"name":"Fountain of Youth","item_id":"building_fountain_of_youth","have":94,"need":800,"pct":11.8,"assembled":0,"in_progress":true,"complete":false,"fpd":0.53,"days":1333,"est":"2029-12-15"},{"name":"Greater Ritual Flame","item_id":"building_greater_ritual_flame","have":10,"need":100,"pct":10.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.06,"days":1500,"est":"2030-05-31"},{"name":"Somerset Hospital Selection Kit","item_id":"selection_kit_GBG25E","have":525,"need":7500,"pct":7.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Fountain Of Youth Shrink Kit","item_id":"shrink_kit_fountain_of_youth","have":19,"need":800,"pct":2.4,"assembled":0,"in_progress":true,"complete":false,"fpd":0.11,"days":7100,"est":"2045-09-29"},{"name":"QI Autumn 2025 Epic Selection Kit","item_id":"selection_kit_epic_GR25_3","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":2.24,"days":447,"est":"2027-07-13"},{"name":"Forgotten Temple - Active","item_id":"building_forgotten_temple","have":0,"need":200,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":1.03,"days":195,"est":"2026-11-03"},{"name":"Shrine of Knowledge Upgrade","item_id":"upgrade_kit_shrine_of_knowledge","have":0,"need":15,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.03,"days":500,"est":"2027-09-04"},{"name":"One Up Kit","item_id":"one_up_kit","have":0,"need":30,"pct":0.0,"assembled":6,"in_progress":true,"complete":false,"fpd":0.28,"days":108,"est":"2026-08-08"},{"name":"Wishing Well","item_id":"building_wishing_well","have":0,"need":15,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.01,"days":1500,"est":"2030-05-31"},{"name":"Guild Expedition 3 Kit","item_id":"selection_kit_gex3","have":0,"need":100,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.42,"days":239,"est":"2026-12-17"},{"name":"Feathered Serpent Statue Chain Kit","item_id":"selection_kit_feathered_serpent_statue_chain","have":0,"need":100,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.22,"days":455,"est":"2027-07-21"},{"name":"Guild Expedition 1 Kit","item_id":"selection_kit_gex1","have":0,"need":100,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.42,"days":239,"est":"2026-12-17"},{"name":"Guild Expedition 2 Kit","item_id":"selection_kit_gex2","have":0,"need":100,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.42,"days":239,"est":"2026-12-17"},{"name":"Guild Expedition 4 Kit","item_id":"selection_kit_gex4","have":0,"need":100,"pct":0.0,"assembled":2,"in_progress":true,"complete":false,"fpd":0.42,"days":239,"est":"2026-12-17"},{"name":"Neo Bazaar Selection Kit","item_id":"selection_kit_GR25C","have":0,"need":1000,"pct":0.0,"assembled":8,"in_progress":true,"complete":false,"fpd":16.77,"days":60,"est":"2026-06-21"},{"name":"Divine Sky Watch","item_id":"building_divine_sky_watch","have":0,"need":120,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.11,"days":1091,"est":"2029-04-17"},{"name":"Store Building","item_id":"store_building","have":0,"need":15,"pct":0.0,"assembled":10,"in_progress":true,"complete":false,"fpd":0.08,"days":188,"est":"2026-10-27"},{"name":"Eternal Market Platinum Selection Kit","item_id":"platinum_selection_kit_LTE24A","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":2.52,"days":397,"est":"2027-05-24"},{"name":"Wishing Well Shrink Kit","item_id":"shrink_kit_wishing_well","have":0,"need":15,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.04,"days":375,"est":"2027-05-02"},{"name":"Shajar al-Durr","item_id":"ally#shajar_al_durr#rare#1","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":false,"complete":false,"fpd":0.0,"days":null,"est":null}]}];
 let t4AP=FRAGS.length>0?FRAGS[0].tag:null;
 let t4SC='pct',t4SA=false;
 
@@ -524,6 +529,11 @@ function t4Render(){
   });
   rows=[...rows].sort((a,b)=>{
     if(t4SC==='name')return t4SA?a.name.localeCompare(b.name):b.name.localeCompare(a.name);
+    if(t4SC==='days'){
+      const av=a.days!=null?a.days:Infinity;
+      const bv=b.days!=null?b.days:Infinity;
+      return t4SA?av-bv:bv-av;
+    }
     return t4SA?(a[t4SC]||0)-(b[t4SC]||0):(b[t4SC]||0)-(a[t4SC]||0);
   });
   document.getElementById('t4-count').textContent=rows.length+' items';
@@ -535,16 +545,26 @@ function t4Render(){
     const pctL='<span class="pct-label" style="color:'+col+'">'+r.pct+'%</span>';
     const haveL='<span class="v '+(r.in_progress?'v-gold':'')+'">'+r.have.toLocaleString()+'</span>';
     const asmL=r.assembled>0?'<span class="v v-green">'+r.assembled+'×</span>':'<span class="zero">—</span>';
+    const fpd=r.fpd||0;
+    const fpdL=fpd>0?'<span class="v v-teal">'+fpd.toFixed(2)+'</span>':'<span class="zero">—</span>';
+    const dc=r.days!=null?r.days:null;
+    const dcCol=dc==null?'zero':dc<30?'v-green':dc<180?'v-gold':'v-att';
+    const daysL=dc!=null?'<span class="v '+dcCol+'">'+dc+'d</span>':'<span class="zero">—</span>';
+    const estL=r.est?'<span class="v" style="font-size:.75rem;color:var(--text2)">'+r.est+'</span>':'<span class="zero">—</span>';
     return'<tr>'
       +'<td class="bn">'+r.name+'</td>'
       +'<td>'+bar+pctL+'</td>'
       +'<td>'+haveL+'</td>'
       +'<td><span class="v">'+r.need.toLocaleString()+'</span></td>'
-      +'<td>'+asmL+'</td></tr>';
+      +'<td>'+asmL+'</td>'
+      +'<td>'+fpdL+'</td>'
+      +'<td>'+daysL+'</td>'
+      +'<td>'+estL+'</td></tr>';
   }).join('');
 }
 function t4ColSort(c){
-  if(t4SC===c)t4SA=!t4SA;else{t4SC=c;t4SA=false;}
+  if(t4SC===c)t4SA=!t4SA;
+  else{t4SC=c;t4SA=(c==='days');} // days: default ascending (soonest first)
   t4Render();
 }
 t4Init();
