@@ -619,6 +619,121 @@ def build_fragment_data(zip_paths):
             print(f"  [Tab4] {zp.name}: no fragment data found")
     return players
 
+def build_friend_data(zip_paths):
+    players = []
+    for zp in zip_paths:
+        result = extract_friend_data(zp)
+        if result:
+            players.append(result)
+        else:
+            print(f"  [Tab5] {zp.name}: no friend data found")
+    return players
+
+
+INACTIVE_DAYS = 14  # Flag friends who have not aided in this many days
+
+
+def extract_friend_data(zip_path):
+    with zipfile.ZipFile(zip_path) as zf:
+        ev_files = [f for f in zf.namelist()
+                    if "FoeHelperDB_Events_" in f and f.endswith(".json")]
+        if not ev_files:
+            return None
+        try:
+            data = json.loads(zf.read(ev_files[0]))
+        except Exception:
+            return None
+
+    tables = {t["tableName"]: t["rows"]
+              for t in data.get("data", {}).get("data", [])}
+    events = tables.get("Events", [])
+    if not events:
+        return None
+
+    friends = {}  # playerid -> {name, friend_since, last_aided}
+
+    for e in events:
+        pid   = e.get("playerid")
+        pname = e.get("playername", "Unknown")
+        date  = e.get("date", 0)
+        etype = e.get("eventtype", "")
+        if not pid or not e.get("isfriend"):
+            continue
+
+        if pid not in friends:
+            friends[pid] = {"name": pname, "friend_since": None, "last_aided": None}
+
+        friends[pid]["name"] = pname
+
+        if etype == "friend_accepted":
+            fs = friends[pid]["friend_since"]
+            if fs is None or date < fs:
+                friends[pid]["friend_since"] = date
+
+        elif etype == "social_interaction":
+            la = friends[pid]["last_aided"]
+            if la is None or date > la:
+                friends[pid]["last_aided"] = date
+
+    if not friends:
+        return None
+
+    today_ms    = datetime.now(timezone.utc).timestamp() * 1000
+    inactive_ms = INACTIVE_DAYS * 86400 * 1000
+
+    friend_rows = []
+    for pid, f in friends.items():
+        last_aided_ms   = f["last_aided"]
+        friend_since_ms = f["friend_since"]
+
+        if last_aided_ms:
+            days_since     = int((today_ms - last_aided_ms) / (86400 * 1000))
+            last_aided_str = datetime.fromtimestamp(
+                last_aided_ms / 1000, tz=timezone.utc).strftime("%Y-%m-%d")
+        else:
+            days_since     = None
+            last_aided_str = None
+
+        if friend_since_ms:
+            friend_since_str = datetime.fromtimestamp(
+                friend_since_ms / 1000, tz=timezone.utc).strftime("%Y-%m-%d")
+            is_new = (today_ms - friend_since_ms) < inactive_ms
+        else:
+            friend_since_str = None
+            is_new = False  # unknown age - don't suppress flag
+
+        if is_new:
+            status = "new"
+        elif last_aided_ms is None or (today_ms - last_aided_ms) > inactive_ms:
+            status = "inactive"
+        else:
+            status = "active"
+
+        friend_rows.append({
+            "name":         f["name"],
+            "player_id":    pid,
+            "friend_since": friend_since_str,
+            "last_aided":   last_aided_str,
+            "days_since":   days_since,
+            "status":       status,
+        })
+
+    STATUS_ORDER = {"inactive": 0, "new": 1, "active": 2}
+    friend_rows.sort(key=lambda x: (
+        STATUS_ORDER[x["status"]],
+        -(x["days_since"] if x["days_since"] is not None else 9999)
+    ))
+
+    m = re.match(r"([A-Z]+)_foe_helper", zip_path.name)
+    tag = m.group(1) if m else zip_path.stem
+
+    inactive = sum(1 for r in friend_rows if r["status"] == "inactive")
+    print(f"  [Tab5] {tag}: {len(friend_rows)} friends "
+          f"({inactive} inactive, threshold={INACTIVE_DAYS}d)")
+
+    return {"tag": tag, "friends": friend_rows, "inactive_days": INACTIVE_DAYS}
+
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # HTML Template
@@ -761,6 +876,7 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <button class="tab-btn" onclick="switchTab('t2',this)">&#9876; Battle Boosts</button>
   <button class="tab-btn" onclick="switchTab('t3',this)">&#127963; GB Planner</button>
   <button class="tab-btn" onclick="switchTab('t4',this)">&#129512; Fragment Tracker</button>
+  <button class="tab-btn" onclick="switchTab('t5',this)">&#128101; Friend Manager</button>
 </div>
 
 <!-- TAB 1 ─────────────────────────────────────────────────────────────────── -->
@@ -920,6 +1036,38 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <th>EST. DATE</th>
 </tr></thead>
 <tbody id="t4-tbody"></tbody>
+</table></div>
+</div>
+
+<!-- TAB 5 ────────────────────────────────────────────────────────────────────────────── -->
+<div id="t5" class="tab-panel">
+<div class="info-box">
+  <strong>Friend Manager</strong> — shows all friends seen in your event history.
+  <strong>Aided</strong> = any social interaction (motivate, polish, or polivate attempt).
+  Friends flagged <span style="color:var(--red)">Inactive</span> have not aided in %%INACTIVE_DAYS%% days and are candidates to drop.
+  Friends flagged <span style="color:var(--teal)">New</span> were added within the last %%INACTIVE_DAYS%% days — give them time.
+  Friends with no recorded aid may predate your FoE Helper history.
+</div>
+<div class="player-pills" id="t5-pills"></div>
+<div class="toolbar">
+  <input class="search-box" id="t5-search" placeholder="Search friend…" oninput="t5Render()">
+  <select class="ddl" id="t5-filter" onchange="t5Render()">
+    <option value="">All friends</option>
+    <option value="inactive">Inactive only</option>
+    <option value="active">Active only</option>
+    <option value="new">New only</option>
+  </select>
+  <span class="count-label" id="t5-count"></span>
+</div>
+<div class="table-wrap"><table>
+<thead><tr>
+  <th onclick="t5ColSort('name')">FRIEND</th>
+  <th onclick="t5ColSort('friend_since')">FRIEND SINCE</th>
+  <th onclick="t5ColSort('last_aided')">LAST AIDED</th>
+  <th onclick="t5ColSort('days_since')">DAYS SINCE AID \u25be</th>
+  <th>STATUS</th>
+</tr></thead>
+<tbody id="t5-tbody"></tbody>
 </table></div>
 </div>
 
@@ -1118,6 +1266,74 @@ function t4ColSort(c){
 }
 t4Init();
 t4Render();
+
+// TAB 5
+const FRIENDS=%%FRIENDS_JSON%%;
+let t5AP=FRIENDS.length>0?FRIENDS[0].tag:null;
+let t5SC='days_since',t5SA=false;
+
+function t5Init(){
+  document.getElementById('t5-pills').innerHTML=FRIENDS.map(p=>
+    '<button class="pill'+(p.tag===t5AP?' active':'')+
+    '" data-tag="'+p.tag+'" onclick="t5Sel(this)">'+p.tag+'</button>'
+  ).join('');
+}
+function t5Sel(el){
+  var tag=el.dataset.tag;
+  t5AP=tag;
+  document.querySelectorAll('#t5-pills .pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  t5Render();
+}
+function t5Render(){
+  const srch=document.getElementById('t5-search').value.toLowerCase();
+  const filt=document.getElementById('t5-filter').value;
+  const pl=FRIENDS.find(p=>p.tag===t5AP);
+  if(!pl){document.getElementById('t5-tbody').innerHTML='';return;}
+  let rows=pl.friends.filter(r=>{
+    if(srch&&!r.name.toLowerCase().includes(srch))return false;
+    if(filt&&r.status!==filt)return false;
+    return true;
+  });
+  rows=[...rows].sort((a,b)=>{
+    if(t5SC==='name')return t5SA?a.name.localeCompare(b.name):b.name.localeCompare(a.name);
+    if(t5SC==='days_since'){
+      const av=a.days_since!=null?a.days_since:999999;
+      const bv=b.days_since!=null?b.days_since:999999;
+      return t5SA?av-bv:bv-av;
+    }
+    if(t5SC==='last_aided'||t5SC==='friend_since'){
+      const av=a[t5SC]||'';
+      const bv=b[t5SC]||'';
+      return t5SA?av.localeCompare(bv):bv.localeCompare(av);
+    }
+    return 0;
+  });
+  const inactive=rows.filter(r=>r.status==='inactive').length;
+  document.getElementById('t5-count').textContent=rows.length+' friends'+(inactive?' \u2014 '+inactive+' inactive':'');
+  document.getElementById('t5-tbody').innerHTML=rows.map(r=>{
+    const sc=r.friend_since?'<span class="v" style="font-size:.75rem;color:var(--text2)">'+r.friend_since+'</span>':'<span class="zero">\u2014</span>';
+    const la=r.last_aided?'<span class="v" style="font-size:.75rem;color:var(--text2)">'+r.last_aided+'</span>':'<span class="zero">\u2014</span>';
+    const dc=r.days_since;
+    const dcCol=dc==null?'zero':r.status==='inactive'?'v-att':dc<7?'v-green':'v-gold';
+    const daysL=dc!=null?'<span class="v '+dcCol+'">'+dc+'d</span>':'<span class="zero">\u2014</span>';
+    const stCol=r.status==='inactive'?'var(--red)':r.status==='new'?'var(--teal)':'var(--green)';
+    const stLabel=r.status==='inactive'?'Inactive':r.status==='new'?'New':'Active';
+    const stL='<span style="font-family:'Share Tech Mono',monospace;font-size:.75rem;color:'+stCol+'">'+stLabel+'</span>';
+    return'<tr>'
+      +'<td class="bn">'+r.name+'</td>'
+      +'<td>'+sc+'</td>'
+      +'<td>'+la+'</td>'
+      +'<td>'+daysL+'</td>'
+      +'<td>'+stL+'</td></tr>';
+  }).join('');
+}
+function t5ColSort(c){
+  if(t5SC===c)t5SA=!t5SA;else{t5SC=c;t5SA=false;}
+  t5Render();
+}
+t5Init();
+t5Render();
 </script>
 </body>
 </html>
@@ -1143,7 +1359,7 @@ def _build_era_options(best_rows, highest_era_idx):
 
 
 def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
-               frag_players, sources, build_date, page_title=None):
+               frag_players, friend_players, sources, build_date, page_title=None):
     """
     Build a full 4-tab page.
     gb_players / frag_players can be the full list (shared dashboard)
@@ -1158,6 +1374,7 @@ def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
     best_json       = json.dumps(best_rows,    separators=(",", ":"), ensure_ascii=True)
     bb_json         = json.dumps(bb_rows,      separators=(",", ":"), ensure_ascii=True)
     frags_json      = json.dumps(frag_players, separators=(",", ":"), ensure_ascii=True)
+    friends_json    = json.dumps(friend_players, separators=(",", ":"), ensure_ascii=True)
     era_order_json  = json.dumps(ERA_ORDER,    separators=(",", ":"))
     era_labels_json = json.dumps(ERA_LABELS,   separators=(",", ":"))
     gb_sections     = build_gb_sections(gb_players)
@@ -1177,6 +1394,8 @@ def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
     html = html.replace("%%BEST_JSON%%",       best_json)
     html = html.replace("%%BB_JSON%%",         bb_json)
     html = html.replace("%%FRAGS_JSON%%",      frags_json)
+    html = html.replace("%%FRIENDS_JSON%%",    friends_json)
+    html = html.replace("%%INACTIVE_DAYS%%",   str(INACTIVE_DAYS))
     html = html.replace("%%GB_SECTIONS%%",     gb_sections)
     return html
 
@@ -1219,6 +1438,8 @@ def build_dashboard_html(best_rows, highest_era_idx, bb_rows,
     html = html.replace("%%BEST_JSON%%",       best_json)
     html = html.replace("%%BB_JSON%%",         bb_json)
     html = html.replace("%%FRAGS_JSON%%",      "[]")
+    html = html.replace("%%FRIENDS_JSON%%",    "[]")
+    html = html.replace("%%INACTIVE_DAYS%%",   str(INACTIVE_DAYS))
     html = html.replace("%%GB_SECTIONS%%",     no_personal)
     return html
 
@@ -1261,6 +1482,8 @@ def main():
     gb_players   = build_gb_data(zip_paths)
     print()
     frag_players = build_fragment_data(zip_paths)
+    print()
+    friend_players = build_friend_data(zip_paths)
 
     # Tag each zip with its player name
     tagged_zips = []
@@ -1290,7 +1513,8 @@ def main():
     for tag, zp in tagged_zips:
         # Filter GB and fragment data to just this player
         player_gbs   = [p for p in gb_players   if p["tag"] == tag]
-        player_frags = [p for p in frag_players  if p["tag"] == tag]
+        player_frags   = [p for p in frag_players   if p["tag"] == tag]
+        player_friends = [p for p in friend_players if p["tag"] == tag]
 
         # Get this player's era for the title
         era_label = player_gbs[0]["era"] if player_gbs else ""
@@ -1299,7 +1523,7 @@ def main():
 
         player_html = build_html(
             best_rows, highest_era_idx,
-            bb_rows, player_gbs, player_frags,
+            bb_rows, player_gbs, player_frags, player_friends,
             [tag], build_date,
             page_title=page_title,
         )
@@ -1314,6 +1538,7 @@ def main():
     print(f"  Files written : {len(written)}")
     print(f"  Tab 1         : {len(best_rows)} boost buildings")
     print(f"  Tab 2         : {len(bb_rows)} battle boost entries")
+    print(f"  Tab 5         : friend data for {len(friend_players)} player(s)")
     print(f"  Players       : {', '.join(sources)}")
     print(f"  Built         : {build_date}")
     print()

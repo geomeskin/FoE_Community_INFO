@@ -134,6 +134,7 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <button class="tab-btn" onclick="switchTab('t2',this)">&#9876; Battle Boosts</button>
   <button class="tab-btn" onclick="switchTab('t3',this)">&#127963; GB Planner</button>
   <button class="tab-btn" onclick="switchTab('t4',this)">&#129512; Fragment Tracker</button>
+  <button class="tab-btn" onclick="switchTab('t5',this)">&#128101; Friend Manager</button>
 </div>
 
 <!-- TAB 1 ─────────────────────────────────────────────────────────────────── -->
@@ -380,6 +381,38 @@ tr:hover td{background:rgba(59,130,246,.04);}
 </table></div>
 </div>
 
+<!-- TAB 5 ────────────────────────────────────────────────────────────────────────────── -->
+<div id="t5" class="tab-panel">
+<div class="info-box">
+  <strong>Friend Manager</strong> — shows all friends seen in your event history.
+  <strong>Aided</strong> = any social interaction (motivate, polish, or polivate attempt).
+  Friends flagged <span style="color:var(--red)">Inactive</span> have not aided in 14 days and are candidates to drop.
+  Friends flagged <span style="color:var(--teal)">New</span> were added within the last 14 days — give them time.
+  Friends with no recorded aid may predate your FoE Helper history.
+</div>
+<div class="player-pills" id="t5-pills"></div>
+<div class="toolbar">
+  <input class="search-box" id="t5-search" placeholder="Search friend…" oninput="t5Render()">
+  <select class="ddl" id="t5-filter" onchange="t5Render()">
+    <option value="">All friends</option>
+    <option value="inactive">Inactive only</option>
+    <option value="active">Active only</option>
+    <option value="new">New only</option>
+  </select>
+  <span class="count-label" id="t5-count"></span>
+</div>
+<div class="table-wrap"><table>
+<thead><tr>
+  <th onclick="t5ColSort('name')">FRIEND</th>
+  <th onclick="t5ColSort('friend_since')">FRIEND SINCE</th>
+  <th onclick="t5ColSort('last_aided')">LAST AIDED</th>
+  <th onclick="t5ColSort('days_since')">DAYS SINCE AID ▾</th>
+  <th>STATUS</th>
+</tr></thead>
+<tbody id="t5-tbody"></tbody>
+</table></div>
+</div>
+
 <div class="footer">
   Data sourced from FoE Helper MegaExports — community reference only. Not affiliated with InnoGames.<br>
   Battle boost data curated by Wyldfyre. &mdash;
@@ -575,6 +608,74 @@ function t4ColSort(c){
 }
 t4Init();
 t4Render();
+
+// TAB 5
+const FRIENDS=[];
+let t5AP=FRIENDS.length>0?FRIENDS[0].tag:null;
+let t5SC='days_since',t5SA=false;
+
+function t5Init(){
+  document.getElementById('t5-pills').innerHTML=FRIENDS.map(p=>
+    '<button class="pill'+(p.tag===t5AP?' active':'')+
+    '" data-tag="'+p.tag+'" onclick="t5Sel(this)">'+p.tag+'</button>'
+  ).join('');
+}
+function t5Sel(el){
+  var tag=el.dataset.tag;
+  t5AP=tag;
+  document.querySelectorAll('#t5-pills .pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  t5Render();
+}
+function t5Render(){
+  const srch=document.getElementById('t5-search').value.toLowerCase();
+  const filt=document.getElementById('t5-filter').value;
+  const pl=FRIENDS.find(p=>p.tag===t5AP);
+  if(!pl){document.getElementById('t5-tbody').innerHTML='';return;}
+  let rows=pl.friends.filter(r=>{
+    if(srch&&!r.name.toLowerCase().includes(srch))return false;
+    if(filt&&r.status!==filt)return false;
+    return true;
+  });
+  rows=[...rows].sort((a,b)=>{
+    if(t5SC==='name')return t5SA?a.name.localeCompare(b.name):b.name.localeCompare(a.name);
+    if(t5SC==='days_since'){
+      const av=a.days_since!=null?a.days_since:999999;
+      const bv=b.days_since!=null?b.days_since:999999;
+      return t5SA?av-bv:bv-av;
+    }
+    if(t5SC==='last_aided'||t5SC==='friend_since'){
+      const av=a[t5SC]||'';
+      const bv=b[t5SC]||'';
+      return t5SA?av.localeCompare(bv):bv.localeCompare(av);
+    }
+    return 0;
+  });
+  const inactive=rows.filter(r=>r.status==='inactive').length;
+  document.getElementById('t5-count').textContent=rows.length+' friends'+(inactive?' — '+inactive+' inactive':'');
+  document.getElementById('t5-tbody').innerHTML=rows.map(r=>{
+    const sc=r.friend_since?'<span class="v" style="font-size:.75rem;color:var(--text2)">'+r.friend_since+'</span>':'<span class="zero">—</span>';
+    const la=r.last_aided?'<span class="v" style="font-size:.75rem;color:var(--text2)">'+r.last_aided+'</span>':'<span class="zero">—</span>';
+    const dc=r.days_since;
+    const dcCol=dc==null?'zero':r.status==='inactive'?'v-att':dc<7?'v-green':'v-gold';
+    const daysL=dc!=null?'<span class="v '+dcCol+'">'+dc+'d</span>':'<span class="zero">—</span>';
+    const stCol=r.status==='inactive'?'var(--red)':r.status==='new'?'var(--teal)':'var(--green)';
+    const stLabel=r.status==='inactive'?'Inactive':r.status==='new'?'New':'Active';
+    const stL='<span style="font-family:'Share Tech Mono',monospace;font-size:.75rem;color:'+stCol+'">'+stLabel+'</span>';
+    return'<tr>'
+      +'<td class="bn">'+r.name+'</td>'
+      +'<td>'+sc+'</td>'
+      +'<td>'+la+'</td>'
+      +'<td>'+daysL+'</td>'
+      +'<td>'+stL+'</td></tr>';
+  }).join('');
+}
+function t5ColSort(c){
+  if(t5SC===c)t5SA=!t5SA;else{t5SC=c;t5SA=false;}
+  t5Render();
+}
+t5Init();
+t5Render();
 </script>
 </body>
 </html>
