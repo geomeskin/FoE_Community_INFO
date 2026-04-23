@@ -1386,7 +1386,7 @@ def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
     html = html.replace("%%BUILDING_COUNT%%",  str(len(best_rows)))
     html = html.replace("%%ERA_COUNT%%",       str(len(present_eras)))
     html = html.replace("%%BUILD_DATE%%",      build_date)
-    html = html.replace("%%DATA_SOURCES%%",    " + ".join(sources))
+    html = html.replace("%%DATA_SOURCES%%",    "%%NAV_LINKS%%")
     html = html.replace("%%ERA_OPTIONS%%",     "\n".join(era_options))
     html = html.replace("%%EVENT_OPTIONS%%",   "\n".join(event_options))
     html = html.replace("%%ERA_ORDER_JSON%%",  era_order_json)
@@ -1430,11 +1430,7 @@ def build_dashboard_html(best_rows, highest_era_idx, bb_rows,
     html = html.replace("%%BUILDING_COUNT%%",  str(len(best_rows)))
     html = html.replace("%%ERA_COUNT%%",       str(len(present_eras)))
     html = html.replace("%%BUILD_DATE%%",      build_date)
-    source_links = " + ".join(
-        f'<a href="{tag}.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">{tag}</a>'
-        for tag in sources
-    )
-    html = html.replace("%%DATA_SOURCES%%",    source_links)
+    html = html.replace("%%DATA_SOURCES%%",    "%%NAV_LINKS%%")
     html = html.replace("%%ERA_OPTIONS%%",     "\n".join(era_options))
     html = html.replace("%%EVENT_OPTIONS%%",   "\n".join(event_options))
     html = html.replace("%%ERA_ORDER_JSON%%",  era_order_json)
@@ -1497,6 +1493,15 @@ def main():
         tagged_zips.append((tag, zp))
 
     sources    = [tag for tag, _ in tagged_zips]
+    # Build nav links — Dashboard + all personal pages
+    def make_nav_links(active_tag=None):
+        links = []
+        dash_style = "color:inherit;text-decoration:underline;text-underline-offset:2px;"
+        links.append(f'<a href="index.html" style="{dash_style}">Dashboard</a>')
+        for tag in sources:
+            links.append(f'<a href="{tag}.html" style="{dash_style}">{tag}</a>')
+        return " + ".join(links)
+
     now        = datetime.now(timezone.utc)
     build_date = f"{now.day} {now.strftime('%b %Y')}"
 
@@ -1507,6 +1512,7 @@ def main():
     dash_html = build_dashboard_html(
         best_rows, highest_era_idx, bb_rows, sources, build_date
     )
+    dash_html = dash_html.replace("%%NAV_LINKS%%", make_nav_links())
     dash_path = script_dir / "index.html"
     dash_path.write_text(dash_html, encoding="utf-8")
     written.append(dash_path)
@@ -1531,6 +1537,7 @@ def main():
             [tag], build_date,
             page_title=page_title,
         )
+        player_html = player_html.replace("%%NAV_LINKS%%", make_nav_links(tag))
         out_path = script_dir / f"{tag}.html"
         out_path.write_text(player_html, encoding="utf-8")
         written.append(out_path)
