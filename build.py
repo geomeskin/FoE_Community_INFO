@@ -1463,7 +1463,7 @@ def main():
         sys.exit(1)
 
     print(f"\nFoE Community INFO Builder")
-    print(f"{'─'*44}")
+    print('-'*44)
     print(f"Processing {len(zip_paths)} export(s):\n")
 
     # ── Shared data (all zips merged) ─────────────────────────────────────────
@@ -1534,7 +1534,7 @@ def main():
               f"  [{player_name} / {era_label}]")
 
     # ── Summary ───────────────────────────────────────────────────────────────
-    print(f"\n{'─'*44}")
+    print('\n' + '-'*44)
     print(f"  Files written : {len(written)}")
     print(f"  Tab 1         : {len(best_rows)} boost buildings")
     print(f"  Tab 2         : {len(bb_rows)} battle boost entries")

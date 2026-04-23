@@ -1,0 +1,15 @@
+
+============================================
+  FoE Community INFO — Update Workflow
+============================================
+
+
+FoE Community INFO Builder
+Traceback (most recent call last):
+  File "C:\Users\Alex\Documents\FoE\FoE_Community_INFO\build.py", line 1548, in <module>
+    main()
+  File "C:\Users\Alex\Documents\FoE\FoE_Community_INFO\build.py", line 1466, in main
+    print(f"{'\u2500'*44}")
+  File "C:\ProgramData\Anaconda3\lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 0-43: character maps to <undefined>
