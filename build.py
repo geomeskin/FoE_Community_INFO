@@ -1319,7 +1319,7 @@ function t5Render(){
     const daysL=dc!=null?'<span class="v '+dcCol+'">'+dc+'d</span>':'<span class="zero">\u2014</span>';
     const stCol=r.status==='inactive'?'var(--red)':r.status==='new'?'var(--teal)':'var(--green)';
     const stLabel=r.status==='inactive'?'Inactive':r.status==='new'?'New':'Active';
-    const stL='<span style="font-family:'Share Tech Mono',monospace;font-size:.75rem;color:'+stCol+'">'+stLabel+'</span>';
+    const stL='<span style="font-family:monospace;font-size:.75rem;color:'+stCol+'">'+ stLabel +'</span>';
     return'<tr>'
       +'<td class="bn">'+r.name+'</td>'
       +'<td>'+sc+'</td>'
