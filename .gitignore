@@ -3,6 +3,7 @@ exports/
 ADMIN/
 
 debug.html
+RebuildCommands.txt
 
 # Also common sense ignores
 *.pyc

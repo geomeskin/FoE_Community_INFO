@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoE Community INFO — Personal Update</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root {
+  --bg:#080c14; --bg2:#0d1220; --bg3:#111827; --panel:#0f1825;
+  --border:#1e2d45; --border2:#263650;
+  --gold:#f0b429; --blue:#3b82f6; --blue2:#7dd3fc;
+  --teal:#14b8a6; --green:#22c55e; --red:#ef4444; --orange:#f97316;
+  --purple:#a855f7;
+  --text:#e2e8f0; --text2:#b8c4d4; --text3:#6b7e99;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-size:14px;min-height:100vh;
+  background-image:radial-gradient(ellipse at 10% 0%,rgba(59,130,246,.08) 0%,transparent 40%),
+  radial-gradient(ellipse at 90% 100%,rgba(20,184,166,.06) 0%,transparent 40%);}
+.app{max-width:1400px;margin:0 auto;padding:24px 20px 60px;}
+
+/* ── Header ── */
+.header{text-align:center;padding:32px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px;}
+.header h1{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;letter-spacing:.06em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+.header p{color:var(--text2);font-size:.85rem;max-width:600px;margin:0 auto 6px;line-height:1.6;}
+.header .privacy{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--teal);
+  margin-top:8px;letter-spacing:.04em;}
+.nav-link{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--text3);margin-top:10px;display:block;}
+.nav-link a{color:var(--teal);text-decoration:none;}
+.nav-link a:hover{color:var(--gold);}
+
+/* ── Upload zone ── */
+.upload-section{margin-bottom:28px;}
+.upload-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:28px;
+  position:relative;overflow:hidden;}
+.upload-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,transparent,var(--gold),transparent);}
+.upload-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:600;color:var(--gold);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;}
+.upload-sub{color:var(--text3);font-size:.8rem;margin-bottom:18px;}
+
+.drop-zone{border:2px dashed var(--border2);border-radius:8px;padding:32px 20px;text-align:center;
+  cursor:pointer;transition:all .2s;position:relative;background:var(--bg2);}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--gold);background:rgba(240,180,41,.04);}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-icon{font-size:2rem;margin-bottom:8px;opacity:.6;}
+.drop-text{color:var(--text2);font-size:.88rem;}
+.drop-text strong{color:var(--gold);}
+.drop-hint{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text3);margin-top:6px;}
+
+.file-list{margin-top:14px;display:flex;flex-direction:column;gap:6px;}
+.file-item{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:6px;padding:8px 12px;font-family:'Share Tech Mono',monospace;font-size:.76rem;}
+.file-item .tag{color:var(--gold);font-weight:700;min-width:60px;}
+.file-item .fname{color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-item .fsize{color:var(--text3);white-space:nowrap;}
+.file-item .remove{color:var(--red);cursor:pointer;padding:0 4px;font-size:.9rem;line-height:1;}
+.file-item .remove:hover{color:#ff6b6b;}
+
+.generate-row{display:flex;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap;}
+.btn-generate{background:linear-gradient(135deg,var(--gold),#c89020);color:#080c14;
+  font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;border:none;border-radius:8px;padding:12px 32px;cursor:pointer;
+  transition:all .15s;white-space:nowrap;}
+.btn-generate:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.btn-generate:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.csv-status{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--text3);}
+.csv-status.ok{color:var(--green);}
+.csv-status.err{color:var(--red);}
+
+/* ── Progress / Status ── */
+.status-bar{background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:14px 18px;margin-bottom:20px;font-family:'Share Tech Mono',monospace;font-size:.78rem;
+  color:var(--text2);display:none;}
+.status-bar.show{display:block;}
+.status-line{margin-bottom:4px;}
+.status-line:last-child{margin-bottom:0;}
+.status-line.ok{color:var(--green);}
+.status-line.err{color:var(--red);}
+.status-line.info{color:var(--teal);}
+
+/* ── Download bar ── */
+.download-bar{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--green);
+  border-radius:8px;padding:16px 20px;margin-bottom:20px;display:none;align-items:center;
+  gap:12px;flex-wrap:wrap;}
+.download-bar.show{display:flex;}
+.download-bar .dl-label{font-family:'Rajdhani',sans-serif;font-weight:600;color:var(--green);
+  font-size:.95rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;}
+.btn-dl{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;
+  padding:7px 16px;font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--gold);
+  cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block;}
+.btn-dl:hover{border-color:var(--gold);background:rgba(240,180,41,.08);}
+
+/* ── Tabs (same as main site) ── */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto;}
+.tab-btn{background:none;border:none;padding:14px 22px;font-family:'Exo 2',sans-serif;
+  font-size:.86rem;font-weight:500;color:var(--text3);cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;}
+.tab-btn:hover{color:var(--text2);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── Shared table styles (mirrors main site) ── */
+.info-box{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--teal);
+  border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:.83rem;line-height:1.7;color:var(--text2);}
+.info-box strong{color:var(--text);}
+.toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+.search-box{flex:1;min-width:160px;background:var(--bg2);border:1px solid var(--border2);
+  border-radius:6px;padding:7px 12px;color:var(--text);font-family:'Exo 2',sans-serif;
+  font-size:.83rem;outline:none;}
+.search-box:focus{border-color:var(--blue);}
+.ddl{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;
+  color:var(--text);font-family:'Exo 2',sans-serif;font-size:.81rem;outline:none;cursor:pointer;}
+.ddl:focus{border-color:var(--blue);}
+.ddl.era-sel{border-color:rgba(240,180,41,.4);color:var(--gold);font-weight:600;}
+.era-wrap{display:flex;align-items:center;gap:6px;}
+.era-label{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text3);white-space:nowrap;}
+.count-label{font-family:'Share Tech Mono',monospace;font-size:.71rem;color:var(--text3);white-space:nowrap;}
+.table-wrap{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:auto;max-height:580px;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--bg3);position:sticky;top:0;z-index:2;font-family:'Share Tech Mono',monospace;
+  font-size:.66rem;letter-spacing:.08em;color:var(--text3);padding:9px 12px;text-align:left;
+  border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+th:hover{color:var(--text2);}
+th.sorted{color:var(--gold);}
+td{padding:7px 12px;border-bottom:1px solid rgba(30,45,69,.4);font-size:.81rem;white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(59,130,246,.04);}
+.bn{color:var(--text);max-width:240px;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.sb{display:inline-block;font-size:.66rem;font-family:'Share Tech Mono',monospace;color:var(--text3);margin-left:4px;}
+.v{font-family:'Share Tech Mono',monospace;}
+.v-gold{color:var(--gold);font-weight:600;}
+.v-att{color:var(--red);}
+.v-def{color:var(--blue2);}
+.v-gbg{color:var(--teal);}
+.v-qi{color:var(--purple);}
+.v-green{color:var(--green);}
+.v-teal{color:var(--teal);}
+.zero{color:var(--text3);}
+.rank{font-family:'Share Tech Mono',monospace;color:var(--text3);font-size:.73rem;width:32px;text-align:right;}
+.rank-1{color:var(--gold);font-weight:700;}
+.rank-2{color:#94a3b8;font-weight:600;}
+.rank-3{color:#cd7c3a;font-weight:600;}
+.evt-tag{display:inline-block;font-size:.66rem;font-family:'Share Tech Mono',monospace;
+  color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:3px;
+  padding:1px 5px;max-width:180px;overflow:hidden;text-overflow:ellipsis;}
+.no-data{color:var(--text3);font-style:italic;font-size:.78rem;}
+.shop-tag{display:inline-block;font-size:.65rem;font-family:'Share Tech Mono',monospace;
+  border-radius:3px;padding:1px 6px;border:1px solid;}
+.shop-Event{color:var(--gold);border-color:rgba(240,180,41,.3);background:rgba(240,180,41,.05);}
+.shop-GBG{color:var(--teal);border-color:rgba(20,184,166,.3);background:rgba(20,184,166,.05);}
+.shop-QI{color:var(--purple);border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.05);}
+.shop-Settlement{color:var(--blue2);border-color:rgba(125,211,252,.3);background:rgba(125,211,252,.05);}
+.prog-wrap{display:inline-block;width:110px;background:var(--bg3);border-radius:4px;height:8px;
+  border:1px solid var(--border);vertical-align:middle;}
+.prog-bar{height:100%;border-radius:3px;background:var(--teal);}
+.prog-bar.complete{background:var(--green);}
+.prog-bar.low{background:var(--text3);}
+.pct-label{font-family:'Share Tech Mono',monospace;font-size:.72rem;margin-left:6px;}
+.player-section{margin-bottom:28px;}
+.player-header{background:var(--bg3);border:1px solid var(--border);border-radius:8px 8px 0 0;
+  padding:10px 16px;display:flex;align-items:center;gap:12px;}
+.player-name{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gold);}
+.player-era{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--teal);}
+.player-tag{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text3);
+  background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:1px 6px;}
+.fp-bar-wrap{display:inline-block;width:90px;background:var(--bg3);border-radius:4px;height:6px;
+  border:1px solid var(--border);vertical-align:middle;}
+.fp-bar{height:100%;border-radius:3px;background:var(--blue);}
+.at-max{color:var(--text3);font-style:italic;font-size:.78rem;}
+.player-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.pill{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;
+  padding:4px 14px;font-family:'Share Tech Mono',monospace;font-size:.73rem;
+  color:var(--text3);cursor:pointer;transition:all .15s;}
+.pill:hover{color:var(--text);}
+.pill.active{background:rgba(240,180,41,.1);border-color:rgba(240,180,41,.4);color:var(--gold);}
+.footer{text-align:center;padding-top:36px;color:var(--text3);font-size:.78rem;
+  border-top:1px solid var(--border);margin-top:40px;}
+.footer a{color:var(--teal);text-decoration:none;}
+
+/* ── Placeholder state ── */
+.placeholder{text-align:center;padding:60px 20px;color:var(--text3);}
+.placeholder .ph-icon{font-size:2.5rem;margin-bottom:12px;opacity:.4;}
+.placeholder p{font-size:.85rem;line-height:1.7;}
+.data-section{display:none;}
+.data-section.show{display:block;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── Header ── -->
+<div class="header">
+  <h1>⚔ FoE Community INFO</h1>
+  <p>Upload your FoE Helper MegaExport to view your personal stats — GB levels, fragment progress, friends, and full boost reference.</p>
+  <div class="privacy">🔒 Your data never leaves your browser — nothing is uploaded or stored anywhere.</div>
+  <div class="nav-link"><a href="index.html">← Community Dashboard</a></div>
+</div>
+
+<!-- ── Upload Section ── -->
+<div class="upload-section">
+  <div class="upload-card">
+    <div class="upload-title">📦 Upload Your MegaExport</div>
+    <div class="upload-sub">Drop your FoE Helper MegaExport ZIP file below. One file at a time — re-upload anytime for fresh data.</div>
+
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".zip" multiple>
+      <div class="drop-icon">📂</div>
+      <div class="drop-text"><strong>Drop ZIP file here</strong> or click to browse</div>
+      <div class="drop-hint">Accepts FoE Helper MegaExport .zip files</div>
+    </div>
+
+    <div class="file-list" id="fileList"></div>
+
+    <div class="generate-row">
+      <button class="btn-generate" id="btnGenerate" disabled onclick="runBuild()">⚡ Generate My Stats</button>
+      <span class="csv-status" id="csvStatus">Loading boost data…</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Status Bar ── -->
+<div class="status-bar" id="statusBar"></div>
+
+<!-- ── Download Bar ── -->
+<div class="download-bar" id="downloadBar">
+  <span class="dl-label">✅ Ready to Download</span>
+  <div id="dlButtons"></div>
+</div>
+
+<!-- ── Data Output ── -->
+<div class="data-section" id="dataSection">
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('t1',this)">⚔ Boost Reference</button>
+    <button class="tab-btn" onclick="switchTab('t2',this)">⚔ Battle Boosts</button>
+    <button class="tab-btn" onclick="switchTab('t3',this)">🏛 GB Planner</button>
+    <button class="tab-btn" onclick="switchTab('t4',this)">🧩 Fragment Tracker</button>
+    <button class="tab-btn" onclick="switchTab('t5',this)">👥 Friend Manager</button>
+  </div>
+
+  <!-- TAB 1 -->
+  <div id="t1" class="tab-panel active">
+    <div class="info-box">
+      <strong>How to use:</strong> Pick your era — all boost values update instantly.
+      <strong>Att%</strong> = attacker attack &nbsp;|&nbsp; <strong>Def%</strong> = attacker defense &nbsp;|&nbsp;
+      <strong>GbG Att/Def%</strong> = Guild Battlegrounds bonuses &nbsp;|&nbsp;
+      <strong>Total</strong> = sum of all four &nbsp;|&nbsp; <strong>Pt</strong> = total per tile.
+    </div>
+    <div class="toolbar">
+      <input class="search-box" id="t1-search" placeholder="Search building name…" oninput="t1Render()">
+      <div class="era-wrap">
+        <span class="era-label">ERA:</span>
+        <select class="ddl era-sel" id="t1-era" onchange="t1Render()"></select>
+      </div>
+      <select class="ddl" id="t1-ftype" onchange="t1Render()">
+        <option value="">All types</option>
+        <option value="event">Event buildings</option>
+        <option value="gbg">GbG boost only</option>
+        <option value="ge">Guild Expedition</option>
+      </select>
+      <select class="ddl" id="t1-fevt" onchange="t1Render()">
+        <option value="">All events</option>
+      </select>
+      <select class="ddl" id="t1-sort" onchange="t1Render()">
+        <option value="tot">Sort: Total</option>
+        <option value="pt">Sort: Per Tile</option>
+        <option value="a">Sort: Att%</option>
+        <option value="d">Sort: Def%</option>
+        <option value="ga">Sort: GbG Att%</option>
+        <option value="gd">Sort: GbG Def%</option>
+        <option value="n">Sort: Name</option>
+        <option value="evt">Sort: Event</option>
+      </select>
+      <span class="count-label" id="t1-count"></span>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th onclick="t1ColSort('rank')">#</th>
+        <th onclick="t1ColSort('n')">BUILDING</th>
+        <th onclick="t1ColSort('tot')">TOTAL ▾</th>
+        <th onclick="t1ColSort('pt')">PT</th>
+        <th onclick="t1ColSort('a')">ATT%</th>
+        <th onclick="t1ColSort('d')">DEF%</th>
+        <th onclick="t1ColSort('ga')">GBG ATT%</th>
+        <th onclick="t1ColSort('gd')">GBG DEF%</th>
+        <th>SIZE</th>
+        <th onclick="t1ColSort('evt')">EVENT</th>
+      </tr></thead>
+      <tbody id="t1-tbody"></tbody>
+    </table></div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div id="t2" class="tab-panel">
+    <div class="info-box">
+      <strong>Battle Boost Reference</strong> curated by Wyldfyre (guild rank #2).
+      Four contexts: <strong style="color:var(--red)">Open World</strong> &nbsp;|&nbsp;
+      <strong style="color:var(--teal)">GEx</strong> &nbsp;|&nbsp;
+      <strong style="color:var(--blue2)">GBG</strong> &nbsp;|&nbsp;
+      <strong style="color:var(--purple)">QI</strong>.
+      &nbsp; AAA = Att for Attacking Army &nbsp;| DAA = Def for Attacking Army &nbsp;|
+      ADA = Att for Defending Army &nbsp;| DDA = Def for Defending Army.
+    </div>
+    <div class="toolbar">
+      <input class="search-box" id="t2-search" placeholder="Search building…" oninput="t2Render()">
+      <select class="ddl" id="t2-shop" onchange="t2Render()">
+        <option value="">All sources</option>
+        <option value="Event">Event</option>
+        <option value="GBG">GBG</option>
+        <option value="QI">QI</option>
+        <option value="Settlement">Settlement</option>
+      </select>
+      <select class="ddl" id="t2-ctx" onchange="t2Render()">
+        <option value="open">Open World</option>
+        <option value="ge">Guild Expedition</option>
+        <option value="gbg">GBG</option>
+        <option value="qi">QI</option>
+      </select>
+      <select class="ddl" id="t2-sort" onchange="t2Render()">
+        <option value="tot">Sort: Total</option>
+        <option value="aaa">Sort: AAA</option>
+        <option value="daa">Sort: DAA</option>
+        <option value="ada">Sort: ADA</option>
+        <option value="dda">Sort: DDA</option>
+        <option value="pt">Sort: Per Tile</option>
+        <option value="name">Sort: Name</option>
+      </select>
+      <span class="count-label" id="t2-count"></span>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th onclick="t2ColSort('rank')">#</th>
+        <th onclick="t2ColSort('name')">BUILDING</th>
+        <th onclick="t2ColSort('tot')">TOTAL ▾</th>
+        <th onclick="t2ColSort('pt')">PT</th>
+        <th onclick="t2ColSort('aaa')">AAA</th>
+        <th onclick="t2ColSort('daa')">DAA</th>
+        <th onclick="t2ColSort('ada')">ADA</th>
+        <th onclick="t2ColSort('dda')">DDA</th>
+        <th>TILES</th>
+        <th>SOURCE</th>
+      </tr></thead>
+      <tbody id="t2-tbody"></tbody>
+    </table></div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div id="t3" class="tab-panel">
+    <div class="info-box">
+      <strong>GB Planner</strong> — Great Building levels from your MegaExport.
+      FP shown is the cost to reach the <em>next</em> level.
+      Progress bar = level / max level. GBs at max are shown at bottom.
+    </div>
+    <div id="t3-content"></div>
+  </div>
+
+  <!-- TAB 4 -->
+  <div id="t4" class="tab-panel">
+    <div class="info-box">
+      <strong>Fragment Tracker</strong> — balance = received − assembled × required.
+      <strong>Frags/Day</strong> = historical accumulation rate from GEx, quests &amp; events (excludes shop purchases).
+      In-progress items shown first.
+    </div>
+    <div class="info-box" style="border-left-color:var(--orange);margin-top:8px;">
+      <strong>⚠️ Known data limitations:</strong>
+      Fragments purchased in the <strong>QI Shop</strong> are not recorded in the FoE Helper export and will not appear here.
+      If your in-game inventory doesn't match this tracker, QI shop purchases are the likely cause.
+    </div>
+    <div class="player-pills" id="t4-pills"></div>
+    <div class="toolbar">
+      <input class="search-box" id="t4-search" placeholder="Search fragment…" oninput="t4Render()">
+      <select class="ddl" id="t4-filter" onchange="t4Render()">
+        <option value="">All items</option>
+        <option value="progress">In progress only</option>
+        <option value="done">Completed only</option>
+      </select>
+      <span class="count-label" id="t4-count"></span>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th onclick="t4ColSort('name')">ITEM</th>
+        <th onclick="t4ColSort('pct')">PROGRESS ▾</th>
+        <th onclick="t4ColSort('have')">HAVE</th>
+        <th onclick="t4ColSort('need')">NEED</th>
+        <th onclick="t4ColSort('assembled')">ASSEMBLED</th>
+        <th onclick="t4ColSort('fpd')">FRAGS/DAY</th>
+        <th onclick="t4ColSort('days')">EST. DAYS</th>
+        <th>EST. DATE</th>
+      </tr></thead>
+      <tbody id="t4-tbody"></tbody>
+    </table></div>
+  </div>
+
+  <!-- TAB 5 -->
+  <div id="t5" class="tab-panel">
+    <div class="info-box">
+      <strong>Friend Manager</strong> — friends seen in your event history.
+      <strong>Aided</strong> = any social interaction.
+      Friends flagged <span style="color:var(--red)">Inactive</span> have not aided in 14 days.
+      Friends flagged <span style="color:var(--teal)">New</span> were added within the last 14 days.
+    </div>
+    <div class="player-pills" id="t5-pills"></div>
+    <div class="toolbar">
+      <input class="search-box" id="t5-search" placeholder="Search friend…" oninput="t5Render()">
+      <select class="ddl" id="t5-filter" onchange="t5Render()">
+        <option value="">All friends</option>
+        <option value="inactive">Inactive only</option>
+        <option value="active">Active only</option>
+        <option value="new">New only</option>
+      </select>
+      <span class="count-label" id="t5-count"></span>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th onclick="t5ColSort('name')">FRIEND</th>
+        <th onclick="t5ColSort('friend_since')">FRIEND SINCE</th>
+        <th onclick="t5ColSort('last_aided')">LAST AIDED</th>
+        <th onclick="t5ColSort('days_since')">DAYS SINCE AID ▾</th>
+        <th>STATUS</th>
+      </tr></thead>
+      <tbody id="t5-tbody"></tbody>
+    </table></div>
+  </div>
+
+</div><!-- end data-section -->
+
+<div class="footer">
+  Data sourced from FoE Helper MegaExports — community reference only. Not affiliated with InnoGames.<br>
+  Battle boost data curated by Wyldfyre. &mdash;
+  <a href="https://github.com/geomeskin/FoE_Community_INFO" target="_blank">GitHub</a>
+</div>
+
+</div><!-- end app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// Constants (mirrored from build.py)
+// ═══════════════════════════════════════════════════════════════════════
+const ERA_ORDER = [
+  "StoneAge","BronzeAge","IronAge","EarlyMiddleAge","HighMiddleAge",
+  "LateMiddleAge","ColonialAge","IndustrialAge","ProgressiveEra",
+  "ModernEra","PostModernEra","ContemporaryEra","TomorrowEra",
+  "FutureEra","ArcticFuture","OceanicFuture","VirtualFuture",
+  "SpaceAgeMars","SpaceAgeAsteroidBelt","SpaceAgeVenus",
+  "SpaceAgeJupiterMoon","SpaceAgeTitan","SpaceAgeSpaceHub"
+];
+const ERA_RANK = {};
+ERA_ORDER.forEach((e,i) => ERA_RANK[e] = i);
+
+const ERA_LABELS = {
+  "StoneAge":"Stone Age","BronzeAge":"Bronze Age","IronAge":"Iron Age",
+  "EarlyMiddleAge":"Early Middle Age","HighMiddleAge":"High Middle Age",
+  "LateMiddleAge":"Late Middle Age","ColonialAge":"Colonial Age",
+  "IndustrialAge":"Industrial Age","ProgressiveEra":"Progressive Era",
+  "ModernEra":"Modern Era","PostModernEra":"Post-Modern Era",
+  "ContemporaryEra":"Contemporary Era","TomorrowEra":"Tomorrow Era",
+  "FutureEra":"Future Era","ArcticFuture":"Arctic Future",
+  "OceanicFuture":"Oceanic Future","VirtualFuture":"Virtual Future",
+  "SpaceAgeMars":"Space Age: Mars","SpaceAgeAsteroidBelt":"Space Age: Asteroid Belt",
+  "SpaceAgeVenus":"Space Age: Venus","SpaceAgeJupiterMoon":"Space Age: Jupiter Moon",
+  "SpaceAgeTitan":"Space Age: Titan","SpaceAgeSpaceHub":"Space Age: Space Hub"
+};
+
+const EVENT_MAP = {
+  "WIN":"Winter Event","WILD":"Wildlife Event","CARE":"Wildlife Care Event",
+  "PAT":"St. Patrick\u2019s Event","SUM":"Summer Event","FALL":"Fall Event",
+  "COP":"COP Climate Event","HAL":"Halloween Event","ANNI":"Anniversary",
+  "GR":"Guild Raids","FELL":"Fellowship Event","HIS":"History Event",
+  "CUP":"Soccer/Cup Event","GBG":"Guild Battlegrounds","BOWL":"Football/Bowl Event",
+  "ARCH":"Architecture Event","HERO":"Hero Event","GEX":"Guild Expedition",
+  "LTE":"Age Bonus","SPR":"Spring Event"
+};
+
+const GENERAL_FEATURES = new Set(["all","guild_expedition","guild_raids"]);
+const GBG_FEATURES = new Set(["battleground"]);
+const ATT_TYPES = new Set(["att_boost_attacker","att_def_boost_attacker","att_def_boost_attacker_defender","att_def_boost_defender"]);
+const DEF_TYPES = new Set(["def_boost_attacker","att_boost_defender","def_boost_defender","att_def_boost_attacker","att_def_boost_attacker_defender","att_def_boost_defender"]);
+
+const INACTIVE_DAYS = 14;
+
+const BB_COL_MAP = {
+  "AAA":"aaa","DAA":"daa","ADA":"ada","DDA":"dda",
+  "GE \u2013 AAA":"ge_aaa","GE - AAA":"ge_aaa",
+  "GE \u2013 DAA":"ge_daa","GE - DAA":"ge_daa",
+  "GE \u2013 ADA":"ge_ada","GE - ADA":"ge_ada",
+  "GE- DDA":"ge_dda","GE \u2013 DDA":"ge_dda","GE - DDA":"ge_dda",
+  " GBG \u2013 AAA":"gbg_aaa","GBG \u2013 AAA":"gbg_aaa","GBG - AAA":"gbg_aaa",
+  "GBG - DAA":"gbg_daa","GBG \u2013 DAA":"gbg_daa",
+  "GBG \u2013 ADA":"gbg_ada","GBG - ADA":"gbg_ada",
+  "GBG \u2013 DDA":"gbg_dda","GBG - DDA":"gbg_dda",
+  "QI \u2013 AAA":"qi_aaa","QI - AAA":"qi_aaa",
+  "QI - DAA ":"qi_daa","QI - DAA":"qi_daa","QI \u2013 DAA":"qi_daa",
+  "QI \u2013 ADA":"qi_ada","QI - ADA":"qi_ada",
+  "QI - DDA":"qi_dda","QI \u2013 DDA":"qi_dda",
+  "GBG Shop Red Coins":"gbg_red","GBG Shop Blue Coins":"gbg_blue"
+};
+
+const BB_INT_KEYS = [
+  "aaa","daa","ada","dda","ge_aaa","ge_daa","ge_ada","ge_dda",
+  "gbg_aaa","gbg_daa","gbg_ada","gbg_dda","qi_aaa","qi_daa","qi_ada","qi_dda",
+  "gbg_red","gbg_blue","tiles"
+];
+
+// ═══════════════════════════════════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════════════════════════════════
+let uploadedFiles = [];   // {name, file} objects
+let bbRows = [];          // battle boost CSV rows
+let bbLoaded = false;
+let BEST = [];            // tab1 boost rows
+let FRAGS = [];           // tab4 fragment players
+let FRIENDS = [];         // tab5 friend players
+let highestEraIdx = 0;
+
+// ═══════════════════════════════════════════════════════════════════════
+// CSV fetch on load
+// ═══════════════════════════════════════════════════════════════════════
+const CSV_URL = 'WyldfyreBattleBoosts.csv';
+
+async function loadCSV() {
+  const el = document.getElementById('csvStatus');
+  try {
+    const r = await fetch(CSV_URL);
+    if (!r.ok) throw new Error('not found');
+    const text = await r.text();
+    bbRows = parseCSV(text);
+    bbLoaded = true;
+    el.textContent = `✓ Boost data loaded (${bbRows.length} buildings)`;
+    el.className = 'csv-status ok';
+  } catch(e) {
+    bbRows = [];
+    bbLoaded = true; // allow generation anyway
+    el.textContent = '⚠ Battle boost CSV not found — Tab 2 will be empty';
+    el.className = 'csv-status err';
+  }
+  updateGenerateBtn();
+}
+
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/);
+  if (!lines.length) return [];
+  const headers = splitCSVRow(lines[0]);
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const vals = splitCSVRow(lines[i]);
+    const raw = {};
+    headers.forEach((h,j) => raw[h] = vals[j] || '');
+    const rec = {};
+    for (const [col, val] of Object.entries(raw)) {
+      const canon = BB_COL_MAP[col.trim()];
+      if (canon) rec[canon] = val.trim();
+    }
+    rec.name  = (raw['Bldg'] || '').trim();
+    rec.tiles = (raw['Tiles'] || '0').trim();
+    rec.shop  = (raw['Shop'] || '').trim();
+    for (const k of BB_INT_KEYS) rec[k] = safeInt(rec[k] || 0);
+    rec.tot_open = rec.aaa + rec.daa + rec.ada + rec.dda;
+    rec.tot_ge   = rec.ge_aaa + rec.ge_daa + rec.ge_ada + rec.ge_dda;
+    rec.tot_gbg  = rec.gbg_aaa + rec.gbg_daa + rec.gbg_ada + rec.gbg_dda;
+    rec.tot_qi   = rec.qi_aaa + rec.qi_daa + rec.qi_ada + rec.qi_dda;
+    rec.tot_all  = rec.tot_open + rec.tot_ge + rec.tot_gbg + rec.tot_qi;
+    rec.pt = rec.tiles > 0 ? Math.round(rec.tot_open / rec.tiles * 100) / 100 : 0;
+    if (rec.name) rows.push(rec);
+  }
+  return rows;
+}
+
+function splitCSVRow(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  result.push(cur);
+  return result;
+}
+
+function safeInt(v) {
+  const n = parseInt(String(v).replace(/[%,]/g,'').trim());
+  return isNaN(n) ? 0 : n;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// File handling
+// ═══════════════════════════════════════════════════════════════════════
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+function handleFiles(files) {
+  for (const f of files) {
+    if (!f.name.endsWith('.zip')) continue;
+    if (uploadedFiles.find(u => u.name === f.name)) continue;
+    uploadedFiles.push({ name: f.name, file: f });
+  }
+  renderFileList();
+  updateGenerateBtn();
+}
+
+function extractTag(filename) {
+  const m = filename.match(/^([A-Z]+)_foe_helper/i);
+  return m ? m[1].toUpperCase() : filename.replace('.zip','').toUpperCase().slice(0,8);
+}
+
+function renderFileList() {
+  const el = document.getElementById('fileList');
+  el.innerHTML = uploadedFiles.map((u,i) => {
+    const tag = extractTag(u.name);
+    const kb = (u.file.size / 1024).toFixed(0);
+    return `<div class="file-item">
+      <span class="tag">${tag}</span>
+      <span class="fname">${u.name}</span>
+      <span class="fsize">${kb} KB</span>
+      <span class="remove" onclick="removeFile(${i})" title="Remove">✕</span>
+    </div>`;
+  }).join('');
+}
+
+function removeFile(i) {
+  uploadedFiles.splice(i, 1);
+  renderFileList();
+  updateGenerateBtn();
+}
+
+function updateGenerateBtn() {
+  document.getElementById('btnGenerate').disabled = uploadedFiles.length === 0 || !bbLoaded;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Status logging
+// ═══════════════════════════════════════════════════════════════════════
+function logStatus(msg, cls='') {
+  const bar = document.getElementById('statusBar');
+  bar.classList.add('show');
+  bar.innerHTML += `<div class="status-line ${cls}">${msg}</div>`;
+  bar.scrollTop = bar.scrollHeight;
+}
+
+function clearStatus() {
+  const bar = document.getElementById('statusBar');
+  bar.innerHTML = '';
+  bar.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Main build pipeline
+// ═══════════════════════════════════════════════════════════════════════
+async function runBuild() {
+  clearStatus();
+  document.getElementById('downloadBar').classList.remove('show');
+  document.getElementById('dataSection').classList.remove('show');
+  document.getElementById('btnGenerate').disabled = true;
+
+  logStatus('Starting build…', 'info');
+
+  try {
+    BEST = [];
+    FRAGS = [];
+    FRIENDS = [];
+    highestEraIdx = 0;
+
+    const gbPlayers = [];
+    const fragPlayers = [];
+    const friendPlayers = [];
+    const tags = [];
+
+    for (const u of uploadedFiles) {
+      const tag = extractTag(u.name);
+      tags.push(tag);
+      logStatus(`Reading ${u.name}…`);
+
+      const arrayBuf = await u.file.arrayBuffer();
+      const zip = await JSZip.loadAsync(arrayBuf);
+
+      // Tab 1 — Boost buildings
+      const { buildings, highestEra } = await extractBoostBuildings(zip);
+      logStatus(`  [Tab 1] ${Object.keys(buildings).length} boost buildings — ${tag}`, 'ok');
+      for (const [bid, b] of Object.entries(buildings)) {
+        const existing = BEST.find(r => r.id === bid);
+        if (!existing) {
+          BEST.push({ n: b.name, id: bid, s: `${b.w}×${b.h}`, t: b.w*b.h, evt: b.evt, e: b.e });
+        }
+      }
+      if (highestEra > highestEraIdx) highestEraIdx = highestEra;
+
+      // Tab 3 — GB data
+      const gbData = await extractGBData(zip, u.name);
+      if (gbData) {
+        gbData.tag = tag;
+        gbPlayers.push(gbData);
+        logStatus(`  [Tab 3] ${gbData.player} (${gbData.era}) — ${gbData.gbs.length} GBs`, 'ok');
+      } else {
+        logStatus(`  [Tab 3] No GB data found`, '');
+      }
+
+      // Tab 4 — Fragment data
+      const fragData = await extractFragmentData(zip, u.name);
+      if (fragData) {
+        fragData.tag = tag;
+        fragPlayers.push(fragData);
+        const inProg = fragData.fragments.filter(r => r.in_progress).length;
+        logStatus(`  [Tab 4] ${fragData.fragments.length} fragment items (${inProg} in progress)`, 'ok');
+      } else {
+        logStatus(`  [Tab 4] No fragment data found`, '');
+      }
+
+      // Tab 5 — Friend data
+      const friendData = await extractFriendData(zip, u.name);
+      if (friendData) {
+        friendData.tag = tag;
+        friendPlayers.push(friendData);
+        const inactive = friendData.friends.filter(r => r.status === 'inactive').length;
+        logStatus(`  [Tab 5] ${friendData.friends.length} friends (${inactive} inactive)`, 'ok');
+      } else {
+        logStatus(`  [Tab 5] No friend data found`, '');
+      }
+    }
+
+    FRAGS = fragPlayers;
+    FRIENDS = friendPlayers;
+
+    logStatus(`\nTab 1: ${BEST.length} total boost buildings`, 'ok');
+    logStatus(`Tab 2: ${bbRows.length} battle boost entries`, 'ok');
+
+    // Render all tabs
+    buildEraSelector();
+    buildEventSelector();
+    t1Render();
+    t2Render();
+    buildGBSections(gbPlayers);
+    t4Init(); t4Render();
+    t5Init(); t5Render();
+
+    // Show output
+    document.getElementById('dataSection').classList.add('show');
+
+    // Generate downloadable HTML files
+    buildDownloadButtons(tags, gbPlayers, fragPlayers, friendPlayers);
+
+    logStatus('✅ Done!', 'ok');
+
+  } catch(err) {
+    logStatus(`ERROR: ${err.message}`, 'err');
+    console.error(err);
+  }
+
+  document.getElementById('btnGenerate').disabled = false;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab 1 — Extract boost buildings from zip
+// ═══════════════════════════════════════════════════════════════════════
+async function extractBoostBuildings(zip) {
+  const buildings = {};
+  let highestEra = 0;
+
+  for (const [fname, entry] of Object.entries(zip.files)) {
+    if (!fname.endsWith('.json')) continue;
+    if (!fname.includes('FoeHelperDB_')) continue;
+    if (/Events|FPCollector|GexStat|GuildFights|GuildMember|Qi/.test(fname)) continue;
+
+    let data;
+    try {
+      const text = await entry.async('text');
+      data = JSON.parse(text);
+    } catch(e) { continue; }
+
+    const tables = data?.data?.data || [];
+    const bm = tables.find(t => t.tableName === 'buildingMeta');
+    if (!bm) continue;
+
+    for (const row of bm.rows) {
+      let j = row.json;
+      if (typeof j === 'string') { try { j = JSON.parse(j); } catch(e) { continue; } }
+      const bid = j?.id || '';
+      if (!bid.startsWith('W_MultiAge_')) continue;
+      if (!j.components) continue;
+
+      const evt = getEvent(bid);
+      if (!evt) continue;
+
+      const allAge = j.components?.AllAge || {};
+      const size = allAge?.placement?.size || {};
+      const w = size.x || 0, h = size.y || 0;
+      if (!w || !h) continue;
+
+      const eraRows = [];
+      for (const era of ERA_ORDER) {
+        const [a, d, ga, gd] = calcBoosts(j.components, era);
+        if (a + d + ga + gd > 0) {
+          const idx = ERA_RANK[era];
+          eraRows.push([idx, a, d, ga, gd]);
+          if (idx > highestEra) highestEra = idx;
+        }
+      }
+      if (!eraRows.length) continue;
+
+      buildings[bid] = { name: j.name, w, h, evt, e: eraRows };
+    }
+  }
+  return { buildings, highestEra };
+}
+
+function calcBoosts(components, era) {
+  let a = 0, d = 0, ga = 0, gd = 0;
+  const boosts = components?.[era]?.boosts?.boosts || [];
+  for (const b of boosts) {
+    const btype = b.type || '';
+    const feat  = b.targetedFeature || 'all';
+    const val   = b.value || 0;
+    const isGen = GENERAL_FEATURES.has(feat);
+    const isGbg = GBG_FEATURES.has(feat);
+    if (ATT_TYPES.has(btype)) {
+      if (isGen) a += val;
+      else if (isGbg) ga += val;
+    }
+    if (DEF_TYPES.has(btype)) {
+      if (isGen) d += val;
+      else if (isGbg) gd += val;
+    }
+  }
+  return [a, d, ga, gd];
+}
+
+function getEvent(bid) {
+  const m = bid.match(/W_MultiAge_([A-Z]+)(\d{2})/);
+  if (!m) return null;
+  const [, code, yr] = m;
+  const name = EVENT_MAP[code];
+  return name ? `${name} 20${yr}` : null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab 3 — GB data
+// ═══════════════════════════════════════════════════════════════════════
+async function extractGBData(zip, zipName) {
+  // Get current_player_id from localStorage
+  let currentPlayerId = null;
+  for (const [fname, entry] of Object.entries(zip.files)) {
+    if (!fname.includes('localStorage') || !fname.endsWith('.json')) continue;
+    try {
+      const ls = JSON.parse(await entry.async('text'));
+      if (ls.current_player_id) currentPlayerId = parseInt(ls.current_player_id);
+    } catch(e) {}
+    break;
+  }
+
+  // Find GuildMemberStat file
+  let gmsEntry = null;
+  for (const [fname, entry] of Object.entries(zip.files)) {
+    if (fname.includes('GuildMemberStat') && fname.endsWith('.json')) { gmsEntry = entry; break; }
+  }
+  if (!gmsEntry) return null;
+
+  let data;
+  try { data = JSON.parse(await gmsEntry.async('text')); } catch(e) { return null; }
+
+  const tables = data?.data?.data || [];
+  const playerTable = tables.find(t => t.tableName === 'player');
+  if (!playerTable?.rows?.length) return null;
+
+  let bestPlayer = null, bestGBCount = -1;
+  for (const p of playerTable.rows) {
+    let gbsRaw = p.greatbuildings || [];
+    if (typeof gbsRaw === 'string') { try { gbsRaw = JSON.parse(gbsRaw); } catch(e) { gbsRaw = []; } }
+    p._gbsParsed = gbsRaw;
+    if (currentPlayerId && p.player_id === currentPlayerId) { bestPlayer = p; break; }
+    if (gbsRaw.length > bestGBCount) { bestGBCount = gbsRaw.length; bestPlayer = p; }
+  }
+  if (!bestPlayer) return null;
+
+  const gbRows = (bestPlayer._gbsParsed || []).map(gb => ({
+    name:      gb.name || 'Unknown',
+    level:     gb.level || 0,
+    max_level: gb.max_level || 0,
+    fp:        gb.forge_points_for_level_up ?? 0,
+    at_max:    (gb.level || 0) >= (gb.max_level || 1),
+  }));
+  gbRows.sort((a,b) => a.at_max === b.at_max ? b.level - a.level : a.at_max - b.at_max);
+
+  return {
+    player: bestPlayer.name || 'Unknown',
+    era:    ERA_LABELS[bestPlayer.era] || bestPlayer.era || '',
+    gbs:    gbRows,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab 4 — Fragment data
+// ═══════════════════════════════════════════════════════════════════════
+async function extractFragmentData(zip, zipName) {
+  // Find current_player_id
+  let currentPlayerId = null;
+  for (const [fname, entry] of Object.entries(zip.files)) {
+    if (!fname.includes('localStorage') || !fname.endsWith('.json')) continue;
+    try {
+      const ls = JSON.parse(await entry.async('text'));
+      if (ls.current_player_id) currentPlayerId = String(ls.current_player_id);
+    } catch(e) {}
+    break;
+  }
+
+  // Find best stats file
+  const statsFiles = Object.entries(zip.files).filter(([f]) =>
+    f.includes('FoeHelperDB_') && f.endsWith('.json') &&
+    !f.includes('Events') && !f.includes('GuildMember') && !f.includes('GuildFights')
+  );
+
+  let bestFile = null, bestCount = -1;
+  for (const [fname, entry] of statsFiles) {
+    if (currentPlayerId && fname.includes(currentPlayerId)) { bestFile = [fname, entry]; break; }
+    try {
+      const data = JSON.parse(await entry.async('text'));
+      const tables = data?.data?.data || [];
+      const sr = tables.find(t => t.tableName === 'statsRewards');
+      const count = sr ? sr.rows.length : 0;
+      if (count > bestCount) { bestCount = count; bestFile = [fname, entry]; }
+    } catch(e) {}
+  }
+  if (!bestFile) return null;
+
+  let data;
+  try { data = JSON.parse(await bestFile[1].async('text')); } catch(e) { return null; }
+
+  const tables = data?.data?.data || [];
+  const rowsByTable = {};
+  for (const t of tables) rowsByTable[t.tableName] = t.rows;
+
+  const rewards     = rowsByTable.statsRewards || [];
+  const rewardTypes = rowsByTable.statsRewardTypes || [];
+
+  // Build fragment metadata
+  const fragMeta = {};
+  for (const rt of rewardTypes) {
+    if (rt.subType !== 'fragment') continue;
+    const assembled = rt.assembledReward;
+    if (!assembled || typeof assembled !== 'object') continue;
+    const itemId = assembled.id || '';
+    if (!itemId) continue;
+    const req  = rt.requiredAmount || 0;
+    const name = assembled.name || itemId;
+    if (!(itemId in fragMeta) || req > 0) {
+      fragMeta[itemId] = { name, req, type: assembled.type || '' };
+    }
+  }
+
+  const EXCLUDE_FROM_RATE = new Set(['item_store']);
+  const fragsIn = {}, assembledCount = {}, fragsForRate = {};
+
+  for (const r of rewards) {
+    const rwd = r.reward || '';
+    const amt = r.amount || 0;
+    const rtype = r.type || 'unknown';
+    if (rwd.startsWith('fragment#')) {
+      const parts = rwd.split('#');
+      if (parts.length >= 2) {
+        const itemId = parts[1];
+        fragsIn[itemId] = (fragsIn[itemId] || 0) + amt;
+        if (!EXCLUDE_FROM_RATE.has(rtype)) fragsForRate[itemId] = (fragsForRate[itemId] || 0) + amt;
+      }
+    } else if (rtype === 'inventory_item' && rwd) {
+      assembledCount[rwd] = (assembledCount[rwd] || 0) + amt;
+    }
+  }
+
+  const dates = rewards.filter(r => r.date).map(r => r.date);
+  let spanDays = 0;
+  if (dates.length >= 2) {
+    spanDays = (Math.max(...dates) - Math.min(...dates)) / (1000 * 86400);
+  }
+
+  const fpdByItem = {};
+  if (spanDays > 0) {
+    for (const [itemId, total] of Object.entries(fragsForRate)) {
+      fpdByItem[itemId] = Math.round(total / spanDays * 100) / 100;
+    }
+  }
+
+  const now = Date.now();
+  const fragRows = [];
+  const allItems = new Set([...Object.keys(fragsIn), ...Object.keys(assembledCount)]);
+
+  for (const itemId of allItems) {
+    const meta = fragMeta[itemId];
+    if (!meta || !meta.req) continue;
+    const totalIn   = fragsIn[itemId] || 0;
+    const kitsMade  = assembledCount[itemId] || 0;
+    const spent     = kitsMade * meta.req;
+    const balance   = Math.max(totalIn - spent, 0);
+    const req       = meta.req;
+    const pct       = req ? Math.round(balance / req * 1000) / 10 : 0;
+    const fpd       = fpdByItem[itemId] || 0;
+    let days = null, est = null;
+    if (fpd > 0 && balance < req) {
+      days = Math.ceil((req - balance) / fpd);
+      const estDate = new Date(now + days * 86400000);
+      est = estDate.toISOString().slice(0, 10);
+    }
+    fragRows.push({
+      name: meta.name, item_id: itemId,
+      have: balance, need: req, pct,
+      assembled: kitsMade,
+      in_progress: balance < req && (balance > 0 || fpd > 0),
+      complete: balance >= req,
+      fpd, days, est,
+    });
+  }
+
+  fragRows.sort((a, b) => {
+    const oa = a.in_progress ? 0 : a.complete ? 1 : 2;
+    const ob = b.in_progress ? 0 : b.complete ? 1 : 2;
+    return oa !== ob ? oa - ob : b.pct - a.pct;
+  });
+
+  return { fragments: fragRows };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab 5 — Friend data
+// ═══════════════════════════════════════════════════════════════════════
+async function extractFriendData(zip, zipName) {
+  let evEntry = null;
+  for (const [fname, entry] of Object.entries(zip.files)) {
+    if (fname.includes('FoeHelperDB_Events_') && fname.endsWith('.json')) { evEntry = entry; break; }
+  }
+  if (!evEntry) return null;
+
+  let data;
+  try { data = JSON.parse(await evEntry.async('text')); } catch(e) { return null; }
+
+  const tables = {};
+  for (const t of (data?.data?.data || [])) tables[t.tableName] = t.rows;
+  const events = tables['Events'] || [];
+  if (!events.length) return null;
+
+  const friends = {};
+  for (const e of events) {
+    const pid   = e.playerid;
+    const pname = e.playername || 'Unknown';
+    const date  = e.date || 0;
+    const etype = e.eventtype || '';
+    if (!pid || !e.isfriend) continue;
+    if (!friends[pid]) friends[pid] = { name: pname, friend_since: null, last_aided: null };
+    friends[pid].name = pname;
+    if (etype === 'friend_accepted') {
+      if (friends[pid].friend_since === null || date < friends[pid].friend_since)
+        friends[pid].friend_since = date;
+    } else if (etype === 'social_interaction') {
+      if (friends[pid].last_aided === null || date > friends[pid].last_aided)
+        friends[pid].last_aided = date;
+    }
+  }
+  if (!Object.keys(friends).length) return null;
+
+  const todayMs    = Date.now();
+  const inactiveMs = INACTIVE_DAYS * 86400 * 1000;
+
+  const friendRows = Object.entries(friends).map(([pid, f]) => {
+    const laMs = f.last_aided;
+    const fsMs = f.friend_since;
+    const daysSince  = laMs ? Math.floor((todayMs - laMs) / 86400000) : null;
+    const lastAided  = laMs ? new Date(laMs).toISOString().slice(0,10) : null;
+    const friendSince= fsMs ? new Date(fsMs).toISOString().slice(0,10) : null;
+    const isNew      = fsMs ? (todayMs - fsMs) < inactiveMs : false;
+    let status = 'active';
+    if (isNew) status = 'new';
+    else if (!laMs || (todayMs - laMs) > inactiveMs) status = 'inactive';
+    return { name: f.name, player_id: pid, friend_since: friendSince, last_aided: lastAided, days_since: daysSince, status };
+  });
+
+  const STATUS_ORDER = { inactive: 0, new: 1, active: 2 };
+  friendRows.sort((a,b) => {
+    const so = STATUS_ORDER[a.status] - STATUS_ORDER[b.status];
+    if (so !== 0) return so;
+    const av = a.days_since ?? 9999, bv = b.days_since ?? 9999;
+    return bv - av;
+  });
+
+  return { friends: friendRows, inactive_days: INACTIVE_DAYS };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab switching
+// ═══════════════════════════════════════════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab 1 — Render
+// ═══════════════════════════════════════════════════════════════════════
+function buildEraSelector() {
+  const presentIdxs = new Set();
+  for (const b of BEST) for (const er of b.e) presentIdxs.add(er[0]);
+  const sorted = [...presentIdxs].sort((a,b) => a-b);
+  const sel = document.getElementById('t1-era');
+  sel.innerHTML = sorted.map(idx => {
+    const era = ERA_ORDER[idx];
+    const isSelected = idx === highestEraIdx ? ' selected' : '';
+    return `<option value="${idx}"${isSelected}>${ERA_LABELS[era]}</option>`;
+  }).join('');
+}
+
+function buildEventSelector() {
+  const evts = [...new Set(BEST.map(b => b.evt).filter(Boolean))].sort();
+  const sel = document.getElementById('t1-fevt');
+  sel.innerHTML = '<option value="">All events</option>' +
+    evts.map(e => `<option value="${e}">${e}</option>`).join('');
+}
+
+function getBoosts(b, eraIdx) {
+  let best = null;
+  for (const r of b.e) { if (r[0] <= eraIdx) best = r; else break; }
+  if (!best) return null;
+  return { a: best[1], d: best[2], ga: best[3], gd: best[4] };
+}
+
+let t1SC = 'tot', t1SA = false;
+function t1Render() {
+  const srch = document.getElementById('t1-search').value.toLowerCase();
+  const ei   = parseInt(document.getElementById('t1-era').value);
+  const ft   = document.getElementById('t1-ftype').value;
+  const fe   = document.getElementById('t1-fevt').value;
+  t1SC = document.getElementById('t1-sort').value;
+  let rows = BEST.map(b => {
+    const bst = getBoosts(b, ei);
+    const a = bst?.a||0, d = bst?.d||0, ga = bst?.ga||0, gd = bst?.gd||0, tot = a+d+ga+gd;
+    return { ...b, a, d, ga, gd, tot, pt: tot > 0 ? +(tot/b.t).toFixed(1) : 0, hd: !!bst };
+  });
+  rows = rows.filter(b => {
+    if (srch && !b.n.toLowerCase().includes(srch)) return false;
+    if (ft === 'event' && !b.evt) return false;
+    if (ft === 'gbg' && b.ga === 0 && b.gd === 0) return false;
+    if (ft === 'ge' && !(b.evt||'').includes('Guild Expedition')) return false;
+    if (fe && b.evt !== fe) return false;
+    return true;
+  });
+  rows.sort((a,b) => {
+    if (t1SC === 'n') return t1SA ? a.n.localeCompare(b.n) : b.n.localeCompare(a.n);
+    if (t1SC === 'evt') return t1SA ? (a.evt||'').localeCompare(b.evt||'') : (b.evt||'').localeCompare(a.evt||'');
+    return t1SA ? (a[t1SC]||0)-(b[t1SC]||0) : (b[t1SC]||0)-(a[t1SC]||0);
+  });
+  document.getElementById('t1-count').textContent = rows.length + ' buildings';
+  const fv = (v,c) => v > 0 ? `<span class="v ${c}">${v}%</span>` : '<span class="zero">—</span>';
+  document.getElementById('t1-tbody').innerHTML = rows.map((b,i) => {
+    const rk = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    const tc = b.hd ? `<span class="v v-gold">${b.tot.toLocaleString()}</span>` : '<span class="no-data">no era data</span>';
+    const pc = b.hd && b.pt > 0 ? `<span class="v v-gold">${b.pt}</span>` : '<span class="zero">—</span>';
+    return `<tr><td class="rank ${rk}">${i+1}</td>`
+      + `<td class="bn">${b.n}<span class="sb">${b.s}</span></td>`
+      + `<td>${tc}</td><td>${pc}</td>`
+      + `<td>${fv(b.a,'v-att')}</td><td>${fv(b.d,'v-def')}</td>`
+      + `<td>${fv(b.ga,'v-gbg')}</td><td>${fv(b.gd,'v-gbg')}</td>`
+      + `<td><span class="sb">${b.s}=${b.t}t</span></td>`
+      + `<td><span class="evt-tag">${b.evt||'—'}</span></td></tr>`;
+  }).join('');
+}
+function t1ColSort(c) {
+  if (t1SC===c) t1SA=!t1SA; else { t1SC=c; t1SA=false; }
+  if (c!=='rank') document.getElementById('t1-sort').value = c;
+  t1Render();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab 2 — Render
+// ═══════════════════════════════════════════════════════════════════════
+let t2SC = 'tot', t2SA = false;
+function t2Fields(ctx) {
+  if (ctx==='ge')  return ['ge_aaa','ge_daa','ge_ada','ge_dda','tot_ge'];
+  if (ctx==='gbg') return ['gbg_aaa','gbg_daa','gbg_ada','gbg_dda','tot_gbg'];
+  if (ctx==='qi')  return ['qi_aaa','qi_daa','qi_ada','qi_dda','tot_qi'];
+  return ['aaa','daa','ada','dda','tot_open'];
+}
+function t2Render() {
+  const srch = document.getElementById('t2-search').value.toLowerCase();
+  const shop = document.getElementById('t2-shop').value;
+  const ctx  = document.getElementById('t2-ctx').value;
+  t2SC = document.getElementById('t2-sort').value;
+  const [fa,fd,fad,fdd,ft] = t2Fields(ctx);
+  const cc = {open:'v-att',ge:'v-gbg',gbg:'v-def',qi:'v-qi'}[ctx]||'v-att';
+  let rows = bbRows.map(b => ({...b, _a:b[fa],_d:b[fd],_ad:b[fad],_dd:b[fdd],_tot:b[ft],
+    _pt:b.tiles>0?+(b[ft]/b.tiles).toFixed(2):0}));
+  rows = rows.filter(b => {
+    if (srch && !b.name.toLowerCase().includes(srch)) return false;
+    if (shop && b.shop !== shop) return false;
+    return true;
+  });
+  const sk = t2SC==='tot'?'_tot':t2SC==='pt'?'_pt':
+    t2SC==='aaa'?'_a':t2SC==='daa'?'_d':t2SC==='ada'?'_ad':t2SC==='dda'?'_dd':null;
+  rows.sort((a,b) => sk ? (t2SA?(a[sk]||0)-(b[sk]||0):(b[sk]||0)-(a[sk]||0))
+    : (t2SA?a.name.localeCompare(b.name):b.name.localeCompare(a.name)));
+  document.getElementById('t2-count').textContent = rows.length + ' buildings';
+  const fv = v => v>0?`<span class="v ${cc}">${v}%</span>`:'<span class="zero">—</span>';
+  document.getElementById('t2-tbody').innerHTML = rows.map((b,i) => {
+    const rk = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    const sc = 'shop-'+(b.shop||'Event');
+    const tc = b._tot>0?`<span class="v v-gold">${b._tot}</span>`:'<span class="zero">—</span>';
+    const pc = b._pt>0?`<span class="v v-gold">${b._pt}</span>`:'<span class="zero">—</span>';
+    return `<tr><td class="rank ${rk}">${i+1}</td>`
+      + `<td class="bn">${b.name}</td>`
+      + `<td>${tc}</td><td>${pc}</td>`
+      + `<td>${fv(b._a)}</td><td>${fv(b._d)}</td>`
+      + `<td>${fv(b._ad)}</td><td>${fv(b._dd)}</td>`
+      + `<td><span class="sb">${b.tiles}t</span></td>`
+      + `<td><span class="shop-tag ${sc}">${b.shop||'—'}</span></td></tr>`;
+  }).join('');
+}
+function t2ColSort(c) {
+  if (t2SC===c) t2SA=!t2SA; else { t2SC=c; t2SA=false; }
+  if (c!=='rank') document.getElementById('t2-sort').value = c;
+  t2Render();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab 3 — GB sections
+// ═══════════════════════════════════════════════════════════════════════
+function buildGBSections(players) {
+  const el = document.getElementById('t3-content');
+  if (!players.length) {
+    el.innerHTML = '<p class="no-data" style="padding:20px">No GB data found in exports.</p>';
+    return;
+  }
+  el.innerHTML = players.map(p => {
+    const rows = p.gbs.map(gb => {
+      const lv = gb.level, mx = gb.max_level;
+      const pct = mx ? Math.round(lv/mx*100) : 0;
+      const fp = gb.fp;
+      const bar = `<div class="fp-bar-wrap"><div class="fp-bar" style="width:${pct}%;background:var(--blue)"></div></div>`;
+      const lvCell = `<span class="v">${lv}</span><span class="sb">/${mx}</span>`;
+      const fpCell = fp ? `<span class="v v-gold">${fp.toLocaleString()}</span>` : '<span class="zero">—</span>';
+      return `<tr><td class="bn">${gb.name}</td><td>${lvCell}</td><td>${bar} <span class="sb">${pct}%</span></td><td>${fpCell}</td></tr>`;
+    }).join('');
+    return `<div class="player-section">
+      <div class="player-header">
+        <span class="player-tag">${p.tag}</span>
+        <span class="player-name">${p.player}</span>
+        <span class="player-era">${p.era}</span>
+        <span class="sb" style="margin-left:auto">${p.gbs.length} GBs</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>GREAT BUILDING</th><th>LEVEL</th><th>PROGRESS</th><th>FP TO NEXT</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab 4 — Fragment render
+// ═══════════════════════════════════════════════════════════════════════
+let t4AP = null, t4SC = 'pct', t4SA = false;
+function t4Init() {
+  t4AP = FRAGS.length > 0 ? FRAGS[0].tag : null;
+  document.getElementById('t4-pills').innerHTML = FRAGS.map(p =>
+    `<button class="pill${p.tag===t4AP?' active':''}" data-tag="${p.tag}" onclick="t4Sel(this)">${p.tag}</button>`
+  ).join('');
+}
+function t4Sel(el) {
+  t4AP = el.dataset.tag;
+  document.querySelectorAll('#t4-pills .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  t4Render();
+}
+function t4Render() {
+  const srch = document.getElementById('t4-search').value.toLowerCase();
+  const filt = document.getElementById('t4-filter').value;
+  const pl = FRAGS.find(p => p.tag === t4AP);
+  if (!pl) { document.getElementById('t4-tbody').innerHTML = ''; return; }
+  let rows = pl.fragments.filter(r => {
+    if (srch && !r.name.toLowerCase().includes(srch)) return false;
+    if (filt === 'progress' && !r.in_progress) return false;
+    if (filt === 'done' && !r.complete) return false;
+    return true;
+  });
+  rows = [...rows].sort((a,b) => {
+    if (t4SC === 'name') return t4SA ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+    if (t4SC === 'days') { const av=a.days??Infinity,bv=b.days??Infinity; return t4SA?av-bv:bv-av; }
+    return t4SA ? (a[t4SC]||0)-(b[t4SC]||0) : (b[t4SC]||0)-(a[t4SC]||0);
+  });
+  document.getElementById('t4-count').textContent = rows.length + ' items';
+  document.getElementById('t4-tbody').innerHTML = rows.map(r => {
+    const pct = Math.min(r.pct, 100);
+    const bc  = r.complete ? 'complete' : pct < 10 ? 'low' : '';
+    const col = r.complete ? 'var(--green)' : r.in_progress ? 'var(--teal)' : 'var(--text3)';
+    const bar = `<div class="prog-wrap"><div class="prog-bar ${bc}" style="width:${pct}%"></div></div>`;
+    const pctL  = `<span class="pct-label" style="color:${col}">${r.pct}%</span>`;
+    const haveL = `<span class="v ${r.in_progress?'v-gold':''}">${r.have.toLocaleString()}</span>`;
+    const asmL  = r.assembled > 0 ? `<span class="v v-green">${r.assembled}×</span>` : '<span class="zero">—</span>';
+    const fpd   = r.fpd || 0;
+    const fpdL  = fpd > 0 ? `<span class="v v-teal">${fpd.toFixed(2)}</span>` : '<span class="zero">—</span>';
+    const dc    = r.days;
+    const dcCol = dc==null?'zero':dc<30?'v-green':dc<180?'v-gold':'v-att';
+    const daysL = dc!=null ? `<span class="v ${dcCol}">${dc}d</span>` : '<span class="zero">—</span>';
+    const estL  = r.est ? `<span class="v" style="font-size:.75rem;color:var(--text2)">${r.est}</span>` : '<span class="zero">—</span>';
+    return `<tr><td class="bn">${r.name}</td><td>${bar}${pctL}</td>`
+      + `<td>${haveL}</td><td><span class="v">${r.need.toLocaleString()}</span></td>`
+      + `<td>${asmL}</td><td>${fpdL}</td><td>${daysL}</td><td>${estL}</td></tr>`;
+  }).join('');
+}
+function t4ColSort(c) {
+  if (t4SC===c) t4SA=!t4SA; else { t4SC=c; t4SA=(c==='days'); }
+  t4Render();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tab 5 — Friend render
+// ═══════════════════════════════════════════════════════════════════════
+let t5AP = null, t5SC = 'days_since', t5SA = false;
+function t5Init() {
+  t5AP = FRIENDS.length > 0 ? FRIENDS[0].tag : null;
+  document.getElementById('t5-pills').innerHTML = FRIENDS.map(p =>
+    `<button class="pill${p.tag===t5AP?' active':''}" data-tag="${p.tag}" onclick="t5Sel(this)">${p.tag}</button>`
+  ).join('');
+}
+function t5Sel(el) {
+  t5AP = el.dataset.tag;
+  document.querySelectorAll('#t5-pills .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  t5Render();
+}
+function t5Render() {
+  const srch = document.getElementById('t5-search').value.toLowerCase();
+  const filt = document.getElementById('t5-filter').value;
+  const pl = FRIENDS.find(p => p.tag === t5AP);
+  if (!pl) { document.getElementById('t5-tbody').innerHTML = ''; return; }
+  let rows = pl.friends.filter(r => {
+    if (srch && !r.name.toLowerCase().includes(srch)) return false;
+    if (filt && r.status !== filt) return false;
+    return true;
+  });
+  rows = [...rows].sort((a,b) => {
+    if (t5SC==='name') return t5SA?a.name.localeCompare(b.name):b.name.localeCompare(a.name);
+    if (t5SC==='days_since') { const av=a.days_since??999999,bv=b.days_since??999999; return t5SA?av-bv:bv-av; }
+    if (t5SC==='last_aided'||t5SC==='friend_since') {
+      const av=a[t5SC]||'',bv=b[t5SC]||'';
+      return t5SA?av.localeCompare(bv):bv.localeCompare(av);
+    }
+    return 0;
+  });
+  const inactive = rows.filter(r => r.status==='inactive').length;
+  document.getElementById('t5-count').textContent = rows.length + ' friends' + (inactive ? ` — ${inactive} inactive` : '');
+  document.getElementById('t5-tbody').innerHTML = rows.map(r => {
+    const sc = r.friend_since ? `<span class="v" style="font-size:.75rem;color:var(--text2)">${r.friend_since}</span>` : '<span class="zero">—</span>';
+    const la = r.last_aided   ? `<span class="v" style="font-size:.75rem;color:var(--text2)">${r.last_aided}</span>`   : '<span class="zero">—</span>';
+    const dc = r.days_since;
+    const dcCol = dc==null?'zero':r.status==='inactive'?'v-att':dc<7?'v-green':'v-gold';
+    const daysL = dc!=null?`<span class="v ${dcCol}">${dc}d</span>`:'<span class="zero">—</span>';
+    const stCol = r.status==='inactive'?'var(--red)':r.status==='new'?'var(--teal)':'var(--green)';
+    const stLabel = r.status==='inactive'?'Inactive':r.status==='new'?'New':'Active';
+    const stL = `<span style="font-family:monospace;font-size:.75rem;color:${stCol}">${stLabel}</span>`;
+    return `<tr><td class="bn">${r.name}</td><td>${sc}</td><td>${la}</td><td>${daysL}</td><td>${stL}</td></tr>`;
+  }).join('');
+}
+function t5ColSort(c) {
+  if (t5SC===c) t5SA=!t5SA; else { t5SC=c; t5SA=false; }
+  t5Render();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Download — generate self-contained HTML file
+// ═══════════════════════════════════════════════════════════════════════
+function buildDownloadButtons(tags, gbPlayers, fragPlayers, friendPlayers) {
+  const bar = document.getElementById('downloadBar');
+  const btns = document.getElementById('dlButtons');
+
+  const now = new Date();
+  const buildDate = `${now.getDate()} ${now.toLocaleString('en',{month:'short'})} ${now.getFullYear()}`;
+
+  // Build one downloadable HTML per uploaded zip
+  const dlItems = uploadedFiles.map((u, idx) => {
+    const tag = tags[idx];
+    const gbData    = gbPlayers.find(p => p.tag === tag);
+    const fragData  = fragPlayers.find(p => p.tag === tag);
+    const friendData= friendPlayers.find(p => p.tag === tag);
+    return { tag, gbData, fragData, friendData, buildDate };
+  });
+
+  btns.innerHTML = dlItems.map(item =>
+    `<button class="btn-dl" onclick="downloadHTML('${item.tag}')">⬇ ${item.tag}.html</button>`
+  ).join(' ');
+
+  // Store for download function
+  window._dlItems = dlItems;
+  bar.classList.add('show');
+}
+
+function downloadHTML(tag) {
+  const item = window._dlItems.find(d => d.tag === tag);
+  if (!item) return;
+
+  const playerName = item.gbData?.player || tag;
+  const playerEra  = item.gbData?.era || '';
+
+  const bestJson    = JSON.stringify(BEST, null, 0);
+  const bbJson      = JSON.stringify(bbRows, null, 0);
+  const fragsJson   = JSON.stringify(item.fragData ? [item.fragData] : [], null, 0);
+  const friendsJson = JSON.stringify(item.friendData ? [item.friendData] : [], null, 0);
+  const gbSectionsHtml = item.gbData ? buildGBSectionsHTML([item.gbData]) : '<p class="no-data" style="padding:20px">No GB data found.</p>';
+
+  // Build era options
+  const presentIdxs = new Set();
+  for (const b of BEST) for (const er of b.e) presentIdxs.add(er[0]);
+  const eraOptions = [...presentIdxs].sort((a,b)=>a-b).map(idx => {
+    const era = ERA_ORDER[idx];
+    const sel = idx === highestEraIdx ? ' selected' : '';
+    return `<option value="${idx}"${sel}>${ERA_LABELS[era]}</option>`;
+  }).join('\n');
+
+  const evts = [...new Set(BEST.map(b => b.evt).filter(Boolean))].sort();
+  const evtOptions = evts.map(e => `<option value="${e}">${e}</option>`).join('\n');
+
+  const navLinks = `<a href="index.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Dashboard</a>`;
+
+  // Inject into the same HTML_TEMPLATE structure used by build.py
+  const html = generateOutputHTML({
+    title: `${playerName} — FoE Community INFO`,
+    buildDate: item.buildDate,
+    buildingCount: BEST.length,
+    eraCount: [...presentIdxs].length,
+    navLinks,
+    eraOptions,
+    evtOptions,
+    bestJson,
+    bbJson,
+    fragsJson,
+    friendsJson,
+    gbSections: gbSectionsHtml,
+    inactiveDays: INACTIVE_DAYS,
+    eraOrderJson: JSON.stringify(ERA_ORDER),
+    eraLabelsJson: JSON.stringify(ERA_LABELS),
+  });
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${tag}.html`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function buildGBSectionsHTML(players) {
+  if (!players.length) return '<p class="no-data" style="padding:20px">No GB data found.</p>';
+  return players.map(p => {
+    const rows = p.gbs.map(gb => {
+      const lv=gb.level, mx=gb.max_level, pct=mx?Math.round(lv/mx*100):0, fp=gb.fp;
+      const bar=`<div class="fp-bar-wrap"><div class="fp-bar" style="width:${pct}%;background:var(--blue)"></div></div>`;
+      const lvCell=`<span class="v">${lv}</span><span class="sb">/${mx}</span>`;
+      const fpCell=fp?`<span class="v v-gold">${fp.toLocaleString()}</span>`:'<span class="zero">—</span>';
+      return `<tr><td class="bn">${gb.name}</td><td>${lvCell}</td><td>${bar} <span class="sb">${pct}%</span></td><td>${fpCell}</td></tr>`;
+    }).join('');
+    return `<div class="player-section">
+<div class="player-header">
+  <span class="player-tag">${p.tag}</span>
+  <span class="player-name">${p.player}</span>
+  <span class="player-era">${p.era}</span>
+  <span class="sb" style="margin-left:auto">${p.gbs.length} GBs</span>
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th>GREAT BUILDING</th><th>LEVEL</th><th>PROGRESS</th><th>FP TO NEXT</th></tr></thead>
+<tbody>${rows}</tbody>
+</table></div></div>`;
+  }).join('');
+}
+
+function generateOutputHTML(d) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${d.title}</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080c14;--bg2:#0d1220;--bg3:#111827;--panel:#0f1825;--border:#1e2d45;--border2:#263650;--gold:#f0b429;--blue:#3b82f6;--blue2:#7dd3fc;--teal:#14b8a6;--green:#22c55e;--red:#ef4444;--orange:#f97316;--purple:#a855f7;--text:#e2e8f0;--text2:#b8c4d4;--text3:#6b7e99;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-size:14px;background-image:radial-gradient(ellipse at 10% 0%,rgba(59,130,246,.08) 0%,transparent 40%),radial-gradient(ellipse at 90% 100%,rgba(20,184,166,.06) 0%,transparent 40%);}
+.app{max-width:1400px;margin:0 auto;padding:24px 20px 60px;}
+.header{text-align:center;padding:32px 0 24px;border-bottom:1px solid var(--border);margin-bottom:0;}
+.header h1{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;letter-spacing:.06em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+.header p{color:var(--text2);font-size:.85rem;max-width:680px;margin:0 auto 14px;line-height:1.6;}
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.badge{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:4px 12px;font-family:'Share Tech Mono',monospace;font-size:.74rem;}
+.badge.gold{color:var(--gold);border-color:rgba(240,180,41,.3);}
+.badge.teal{color:var(--teal);border-color:rgba(20,184,166,.3);}
+.badge.green{color:var(--green);border-color:rgba(34,197,94,.3);}
+.badge.blue{color:var(--blue2);border-color:rgba(125,211,252,.3);}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto;}
+.tab-btn{background:none;border:none;padding:14px 24px;font-family:'Exo 2',sans-serif;font-size:.88rem;font-weight:500;color:var(--text3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;}
+.tab-btn:hover{color:var(--text2);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.info-box{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:.83rem;line-height:1.7;color:var(--text2);}
+.info-box strong{color:var(--text);}
+.toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+.search-box{flex:1;min-width:160px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:7px 12px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.83rem;outline:none;}
+.search-box:focus{border-color:var(--blue);}
+.ddl{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.81rem;outline:none;cursor:pointer;}
+.ddl.era-sel{border-color:rgba(240,180,41,.4);color:var(--gold);font-weight:600;}
+.era-wrap{display:flex;align-items:center;gap:6px;}
+.era-label{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text3);white-space:nowrap;}
+.count-label{font-family:'Share Tech Mono',monospace;font-size:.71rem;color:var(--text3);white-space:nowrap;}
+.table-wrap{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:auto;max-height:600px;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--bg3);position:sticky;top:0;z-index:2;font-family:'Share Tech Mono',monospace;font-size:.66rem;letter-spacing:.08em;color:var(--text3);padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+th:hover{color:var(--text2);}
+td{padding:7px 12px;border-bottom:1px solid rgba(30,45,69,.4);font-size:.81rem;white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(59,130,246,.04);}
+.bn{color:var(--text);max-width:240px;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.sb{display:inline-block;font-size:.66rem;font-family:'Share Tech Mono',monospace;color:var(--text3);margin-left:4px;}
+.v{font-family:'Share Tech Mono',monospace;}
+.v-gold{color:var(--gold);font-weight:600;}
+.v-att{color:var(--red);}
+.v-def{color:var(--blue2);}
+.v-gbg{color:var(--teal);}
+.v-qi{color:var(--purple);}
+.v-green{color:var(--green);}
+.v-teal{color:var(--teal);}
+.zero{color:var(--text3);}
+.rank{font-family:'Share Tech Mono',monospace;color:var(--text3);font-size:.73rem;width:32px;text-align:right;}
+.rank-1{color:var(--gold);font-weight:700;}
+.rank-2{color:#94a3b8;font-weight:600;}
+.rank-3{color:#cd7c3a;font-weight:600;}
+.evt-tag{display:inline-block;font-size:.66rem;font-family:'Share Tech Mono',monospace;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:1px 5px;max-width:180px;overflow:hidden;text-overflow:ellipsis;}
+.no-data{color:var(--text3);font-style:italic;font-size:.78rem;}
+.shop-tag{display:inline-block;font-size:.65rem;font-family:'Share Tech Mono',monospace;border-radius:3px;padding:1px 6px;border:1px solid;}
+.shop-Event{color:var(--gold);border-color:rgba(240,180,41,.3);background:rgba(240,180,41,.05);}
+.shop-GBG{color:var(--teal);border-color:rgba(20,184,166,.3);background:rgba(20,184,166,.05);}
+.shop-QI{color:var(--purple);border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.05);}
+.shop-Settlement{color:var(--blue2);border-color:rgba(125,211,252,.3);background:rgba(125,211,252,.05);}
+.prog-wrap{display:inline-block;width:110px;background:var(--bg3);border-radius:4px;height:8px;border:1px solid var(--border);vertical-align:middle;}
+.prog-bar{height:100%;border-radius:3px;background:var(--teal);}
+.prog-bar.complete{background:var(--green);}
+.prog-bar.low{background:var(--text3);}
+.pct-label{font-family:'Share Tech Mono',monospace;font-size:.72rem;margin-left:6px;}
+.player-section{margin-bottom:28px;}
+.player-header{background:var(--bg3);border:1px solid var(--border);border-radius:8px 8px 0 0;padding:10px 16px;display:flex;align-items:center;gap:12px;}
+.player-name{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gold);}
+.player-era{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--teal);}
+.player-tag{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:1px 6px;}
+.fp-bar-wrap{display:inline-block;width:90px;background:var(--bg3);border-radius:4px;height:6px;border:1px solid var(--border);vertical-align:middle;}
+.fp-bar{height:100%;border-radius:3px;background:var(--blue);}
+.player-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.pill{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 14px;font-family:'Share Tech Mono',monospace;font-size:.73rem;color:var(--text3);cursor:pointer;transition:all .15s;}
+.pill:hover{color:var(--text);}
+.pill.active{background:rgba(240,180,41,.1);border-color:rgba(240,180,41,.4);color:var(--gold);}
+.footer{text-align:center;padding-top:36px;color:var(--text3);font-size:.78rem;border-top:1px solid var(--border);margin-top:40px;}
+.footer a{color:var(--teal);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="header">
+  <h1>⚔ FoE Community INFO</h1>
+  <p>Community reference tool for Forge of Empires — building boosts, battle reference, GB planning, and fragment tracking.</p>
+  <div class="badges">
+    <span class="badge gold">${d.buildingCount} Buildings</span>
+    <span class="badge teal">${d.eraCount} Eras</span>
+    <span class="badge green">Updated ${d.buildDate}</span>
+    <span class="badge blue">${d.navLinks}</span>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('t1',this)">⚔ Boost Reference</button>
+  <button class="tab-btn" onclick="switchTab('t2',this)">⚔ Battle Boosts</button>
+  <button class="tab-btn" onclick="switchTab('t3',this)">🏛 GB Planner</button>
+  <button class="tab-btn" onclick="switchTab('t4',this)">🧩 Fragment Tracker</button>
+  <button class="tab-btn" onclick="switchTab('t5',this)">👥 Friend Manager</button>
+</div>
+<div id="t1" class="tab-panel active">
+<div class="info-box"><strong>How to use:</strong> Pick your era — all boost values update instantly. <strong>Att%</strong> = attacker attack &nbsp;|&nbsp; <strong>Def%</strong> = attacker defense &nbsp;|&nbsp; <strong>GbG Att/Def%</strong> = Guild Battlegrounds bonuses &nbsp;|&nbsp; <strong>Total</strong> = sum of all four &nbsp;|&nbsp; <strong>Pt</strong> = total per tile.</div>
+<div class="toolbar">
+  <input class="search-box" id="t1-search" placeholder="Search building name…" oninput="t1Render()">
+  <div class="era-wrap"><span class="era-label">ERA:</span><select class="ddl era-sel" id="t1-era" onchange="t1Render()">${d.eraOptions}</select></div>
+  <select class="ddl" id="t1-ftype" onchange="t1Render()"><option value="">All types</option><option value="event">Event buildings</option><option value="gbg">GbG boost only</option><option value="ge">Guild Expedition</option></select>
+  <select class="ddl" id="t1-fevt" onchange="t1Render()"><option value="">All events</option>${d.evtOptions}</select>
+  <select class="ddl" id="t1-sort" onchange="t1Render()"><option value="tot">Sort: Total</option><option value="pt">Sort: Per Tile</option><option value="a">Sort: Att%</option><option value="d">Sort: Def%</option><option value="ga">Sort: GbG Att%</option><option value="gd">Sort: GbG Def%</option><option value="n">Sort: Name</option><option value="evt">Sort: Event</option></select>
+  <span class="count-label" id="t1-count"></span>
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th onclick="t1ColSort('rank')">#</th><th onclick="t1ColSort('n')">BUILDING</th><th onclick="t1ColSort('tot')">TOTAL ▾</th><th onclick="t1ColSort('pt')">PT</th><th onclick="t1ColSort('a')">ATT%</th><th onclick="t1ColSort('d')">DEF%</th><th onclick="t1ColSort('ga')">GBG ATT%</th><th onclick="t1ColSort('gd')">GBG DEF%</th><th>SIZE</th><th onclick="t1ColSort('evt')">EVENT</th></tr></thead>
+<tbody id="t1-tbody"></tbody></table></div></div>
+<div id="t2" class="tab-panel">
+<div class="info-box"><strong>Battle Boost Reference</strong> curated by Wyldfyre (guild rank #2). Four contexts: <strong style="color:var(--red)">Open World</strong> &nbsp;|&nbsp; <strong style="color:var(--teal)">GEx</strong> &nbsp;|&nbsp; <strong style="color:var(--blue2)">GBG</strong> &nbsp;|&nbsp; <strong style="color:var(--purple)">QI</strong>. &nbsp; AAA = Att for Attacking Army &nbsp;| DAA = Def for Attacking Army &nbsp;| ADA = Att for Defending Army &nbsp;| DDA = Def for Defending Army.</div>
+<div class="toolbar">
+  <input class="search-box" id="t2-search" placeholder="Search building…" oninput="t2Render()">
+  <select class="ddl" id="t2-shop" onchange="t2Render()"><option value="">All sources</option><option value="Event">Event</option><option value="GBG">GBG</option><option value="QI">QI</option><option value="Settlement">Settlement</option></select>
+  <select class="ddl" id="t2-ctx" onchange="t2Render()"><option value="open">Open World</option><option value="ge">Guild Expedition</option><option value="gbg">GBG</option><option value="qi">QI</option></select>
+  <select class="ddl" id="t2-sort" onchange="t2Render()"><option value="tot">Sort: Total</option><option value="aaa">Sort: AAA</option><option value="daa">Sort: DAA</option><option value="ada">Sort: ADA</option><option value="dda">Sort: DDA</option><option value="pt">Sort: Per Tile</option><option value="name">Sort: Name</option></select>
+  <span class="count-label" id="t2-count"></span>
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th onclick="t2ColSort('rank')">#</th><th onclick="t2ColSort('name')">BUILDING</th><th onclick="t2ColSort('tot')">TOTAL ▾</th><th onclick="t2ColSort('pt')">PT</th><th onclick="t2ColSort('aaa')">AAA</th><th onclick="t2ColSort('daa')">DAA</th><th onclick="t2ColSort('ada')">ADA</th><th onclick="t2ColSort('dda')">DDA</th><th>TILES</th><th>SOURCE</th></tr></thead>
+<tbody id="t2-tbody"></tbody></table></div></div>
+<div id="t3" class="tab-panel">
+<div class="info-box"><strong>GB Planner</strong> — Great Building levels from your MegaExport. FP shown is the cost to reach the <em>next</em> level. Progress bar = level / max level. GBs at max are shown at bottom.</div>
+<div id="t3-content">${d.gbSections}</div></div>
+<div id="t4" class="tab-panel">
+<div class="info-box"><strong>Fragment Tracker</strong> — balance = received − assembled × required. <strong>Frags/Day</strong> = historical accumulation rate from GEx, quests &amp; events (excludes shop purchases). In-progress items shown first.</div>
+<div class="info-box" style="border-left-color:var(--orange);margin-top:8px;"><strong>⚠️ Known data limitations:</strong> Fragments purchased in the <strong>QI Shop</strong> are not recorded in the FoE Helper export and will not appear here.</div>
+<div class="player-pills" id="t4-pills"></div>
+<div class="toolbar">
+  <input class="search-box" id="t4-search" placeholder="Search fragment…" oninput="t4Render()">
+  <select class="ddl" id="t4-filter" onchange="t4Render()"><option value="">All items</option><option value="progress">In progress only</option><option value="done">Completed only</option></select>
+  <span class="count-label" id="t4-count"></span>
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th onclick="t4ColSort('name')">ITEM</th><th onclick="t4ColSort('pct')">PROGRESS ▾</th><th onclick="t4ColSort('have')">HAVE</th><th onclick="t4ColSort('need')">NEED</th><th onclick="t4ColSort('assembled')">ASSEMBLED</th><th onclick="t4ColSort('fpd')">FRAGS/DAY</th><th onclick="t4ColSort('days')">EST. DAYS</th><th>EST. DATE</th></tr></thead>
+<tbody id="t4-tbody"></tbody></table></div></div>
+<div id="t5" class="tab-panel">
+<div class="info-box"><strong>Friend Manager</strong> — friends seen in your event history. Friends flagged <span style="color:var(--red)">Inactive</span> have not aided in ${d.inactiveDays} days. Friends flagged <span style="color:var(--teal)">New</span> were added within the last ${d.inactiveDays} days.</div>
+<div class="player-pills" id="t5-pills"></div>
+<div class="toolbar">
+  <input class="search-box" id="t5-search" placeholder="Search friend…" oninput="t5Render()">
+  <select class="ddl" id="t5-filter" onchange="t5Render()"><option value="">All friends</option><option value="inactive">Inactive only</option><option value="active">Active only</option><option value="new">New only</option></select>
+  <span class="count-label" id="t5-count"></span>
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th onclick="t5ColSort('name')">FRIEND</th><th onclick="t5ColSort('friend_since')">FRIEND SINCE</th><th onclick="t5ColSort('last_aided')">LAST AIDED</th><th onclick="t5ColSort('days_since')">DAYS SINCE AID ▾</th><th>STATUS</th></tr></thead>
+<tbody id="t5-tbody"></tbody></table></div></div>
+<div class="footer">Data sourced from FoE Helper MegaExports — community reference only. Not affiliated with InnoGames.<br>Battle boost data curated by Wyldfyre.</div>
+</div>
+<script>
+function switchTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');}
+const ERA_ORDER=${d.eraOrderJson};
+const ERA_LABELS=${d.eraLabelsJson};
+const BEST=${d.bestJson};
+const BB=${d.bbJson};
+const FRAGS=${d.fragsJson};
+const FRIENDS=${d.friendsJson};
+const INACTIVE_DAYS=${d.inactiveDays};
+function getBoosts(b,eraIdx){let best=null;for(const r of b.e){if(r[0]<=eraIdx)best=r;else break;}if(!best)return null;return{a:best[1],d:best[2],ga:best[3],gd:best[4]};}
+let t1SC='tot',t1SA=false;
+function t1Render(){const srch=document.getElementById('t1-search').value.toLowerCase();const ei=parseInt(document.getElementById('t1-era').value);const ft=document.getElementById('t1-ftype').value;const fe=document.getElementById('t1-fevt').value;t1SC=document.getElementById('t1-sort').value;let rows=BEST.map(b=>{const bst=getBoosts(b,ei);const a=bst?bst.a:0,d=bst?bst.d:0,ga=bst?bst.ga:0,gd=bst?bst.gd:0,tot=a+d+ga+gd;return{...b,a,d,ga,gd,tot,pt:tot>0?+(tot/b.t).toFixed(1):0,hd:!!bst};});rows=rows.filter(b=>{if(srch&&!b.n.toLowerCase().includes(srch))return false;if(ft==='event'&&!b.evt)return false;if(ft==='gbg'&&b.ga===0&&b.gd===0)return false;if(ft==='ge'&&!(b.evt||'').includes('Guild Expedition'))return false;if(fe&&b.evt!==fe)return false;return true;});rows.sort((a,b)=>{if(t1SC==='n')return t1SA?a.n.localeCompare(b.n):b.n.localeCompare(a.n);if(t1SC==='evt')return t1SA?(a.evt||'').localeCompare(b.evt||''):(b.evt||'').localeCompare(a.evt||'');return t1SA?(a[t1SC]||0)-(b[t1SC]||0):(b[t1SC]||0)-(a[t1SC]||0);});document.getElementById('t1-count').textContent=rows.length+' buildings';const fv=(v,c)=>v>0?'<span class="v '+c+'">'+v+'%</span>':'<span class="zero">—</span>';document.getElementById('t1-tbody').innerHTML=rows.map((b,i)=>{const rk=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';const tc=b.hd?'<span class="v v-gold">'+b.tot.toLocaleString()+'</span>':'<span class="no-data">no era data</span>';const pc=b.hd&&b.pt>0?'<span class="v v-gold">'+b.pt+'</span>':'<span class="zero">—</span>';return'<tr><td class="rank '+rk+'">'+(i+1)+'</td><td class="bn">'+b.n+'<span class="sb">'+b.s+'</span></td><td>'+tc+'</td><td>'+pc+'</td><td>'+fv(b.a,'v-att')+'</td><td>'+fv(b.d,'v-def')+'</td><td>'+fv(b.ga,'v-gbg')+'</td><td>'+fv(b.gd,'v-gbg')+'</td><td><span class="sb">'+b.s+'='+b.t+'t</span></td><td><span class="evt-tag">'+(b.evt||'—')+'</span></td></tr>';}).join('');}
+function t1ColSort(c){if(t1SC===c)t1SA=!t1SA;else{t1SC=c;t1SA=false;}if(c!=='rank')document.getElementById('t1-sort').value=c;t1Render();}
+t1Render();
+let t2SC='tot',t2SA=false;
+function t2Fields(ctx){if(ctx==='ge')return['ge_aaa','ge_daa','ge_ada','ge_dda','tot_ge'];if(ctx==='gbg')return['gbg_aaa','gbg_daa','gbg_ada','gbg_dda','tot_gbg'];if(ctx==='qi')return['qi_aaa','qi_daa','qi_ada','qi_dda','tot_qi'];return['aaa','daa','ada','dda','tot_open'];}
+function t2Render(){const srch=document.getElementById('t2-search').value.toLowerCase();const shop=document.getElementById('t2-shop').value;const ctx=document.getElementById('t2-ctx').value;t2SC=document.getElementById('t2-sort').value;const[fa,fd,fad,fdd,ft]=t2Fields(ctx);const cc={open:'v-att',ge:'v-gbg',gbg:'v-def',qi:'v-qi'}[ctx]||'v-att';let rows=BB.map(b=>({...b,_a:b[fa],_d:b[fd],_ad:b[fad],_dd:b[fdd],_tot:b[ft],_pt:b.tiles>0?+(b[ft]/b.tiles).toFixed(2):0}));rows=rows.filter(b=>{if(srch&&!b.name.toLowerCase().includes(srch))return false;if(shop&&b.shop!==shop)return false;return true;});const sk=t2SC==='tot'?'_tot':t2SC==='pt'?'_pt':t2SC==='aaa'?'_a':t2SC==='daa'?'_d':t2SC==='ada'?'_ad':t2SC==='dda'?'_dd':null;rows.sort((a,b)=>sk?(t2SA?(a[sk]||0)-(b[sk]||0):(b[sk]||0)-(a[sk]||0)):(t2SA?a.name.localeCompare(b.name):b.name.localeCompare(a.name)));document.getElementById('t2-count').textContent=rows.length+' buildings';const fv=v=>v>0?'<span class="v '+cc+'">'+v+'%</span>':'<span class="zero">—</span>';document.getElementById('t2-tbody').innerHTML=rows.map((b,i)=>{const rk=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';const sc='shop-'+(b.shop||'Event');const tc=b._tot>0?'<span class="v v-gold">'+b._tot+'</span>':'<span class="zero">—</span>';const pc=b._pt>0?'<span class="v v-gold">'+b._pt+'</span>':'<span class="zero">—</span>';return'<tr><td class="rank '+rk+'">'+(i+1)+'</td><td class="bn">'+b.name+'</td><td>'+tc+'</td><td>'+pc+'</td><td>'+fv(b._a)+'</td><td>'+fv(b._d)+'</td><td>'+fv(b._ad)+'</td><td>'+fv(b._dd)+'</td><td><span class="sb">'+b.tiles+'t</span></td><td><span class="shop-tag '+sc+'">'+(b.shop||'—')+'</span></td></tr>';}).join('');}
+function t2ColSort(c){if(t2SC===c)t2SA=!t2SA;else{t2SC=c;t2SA=false;}if(c!=='rank')document.getElementById('t2-sort').value=c;t2Render();}
+t2Render();
+let t4AP=FRAGS.length>0?FRAGS[0].tag:null,t4SC='pct',t4SA=false;
+function t4Init(){document.getElementById('t4-pills').innerHTML=FRAGS.map(p=>'<button class="pill'+(p.tag===t4AP?' active':'')+'" data-tag="'+p.tag+'" onclick="t4Sel(this)">'+p.tag+'</button>').join('');}
+function t4Sel(el){t4AP=el.dataset.tag;document.querySelectorAll('#t4-pills .pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');t4Render();}
+function t4Render(){const srch=document.getElementById('t4-search').value.toLowerCase();const filt=document.getElementById('t4-filter').value;const pl=FRAGS.find(p=>p.tag===t4AP);if(!pl){document.getElementById('t4-tbody').innerHTML='';return;}let rows=pl.fragments.filter(r=>{if(srch&&!r.name.toLowerCase().includes(srch))return false;if(filt==='progress'&&!r.in_progress)return false;if(filt==='done'&&!r.complete)return false;return true;});rows=[...rows].sort((a,b)=>{if(t4SC==='name')return t4SA?a.name.localeCompare(b.name):b.name.localeCompare(a.name);if(t4SC==='days'){const av=a.days!=null?a.days:Infinity,bv=b.days!=null?b.days:Infinity;return t4SA?av-bv:bv-av;}return t4SA?(a[t4SC]||0)-(b[t4SC]||0):(b[t4SC]||0)-(a[t4SC]||0);});document.getElementById('t4-count').textContent=rows.length+' items';document.getElementById('t4-tbody').innerHTML=rows.map(r=>{const pct=Math.min(r.pct,100);const bc=r.complete?'complete':pct<10?'low':'';const col=r.complete?'var(--green)':r.in_progress?'var(--teal)':'var(--text3)';const bar='<div class="prog-wrap"><div class="prog-bar '+bc+'" style="width:'+pct+'%"></div></div>';const pctL='<span class="pct-label" style="color:'+col+'">'+r.pct+'%</span>';const haveL='<span class="v '+(r.in_progress?'v-gold':'')+'">'+r.have.toLocaleString()+'</span>';const asmL=r.assembled>0?'<span class="v v-green">'+r.assembled+'×</span>':'<span class="zero">—</span>';const fpd=r.fpd||0;const fpdL=fpd>0?'<span class="v v-teal">'+fpd.toFixed(2)+'</span>':'<span class="zero">—</span>';const dc=r.days;const dcCol=dc==null?'zero':dc<30?'v-green':dc<180?'v-gold':'v-att';const daysL=dc!=null?'<span class="v '+dcCol+'">'+dc+'d</span>':'<span class="zero">—</span>';const estL=r.est?'<span class="v" style="font-size:.75rem;color:var(--text2)">'+r.est+'</span>':'<span class="zero">—</span>';return'<tr><td class="bn">'+r.name+'</td><td>'+bar+pctL+'</td><td>'+haveL+'</td><td><span class="v">'+r.need.toLocaleString()+'</span></td><td>'+asmL+'</td><td>'+fpdL+'</td><td>'+daysL+'</td><td>'+estL+'</td></tr>';}).join('');}
+function t4ColSort(c){if(t4SC===c)t4SA=!t4SA;else{t4SC=c;t4SA=(c==='days');}t4Render();}
+t4Init();t4Render();
+let t5AP=FRIENDS.length>0?FRIENDS[0].tag:null,t5SC='days_since',t5SA=false;
+function t5Init(){document.getElementById('t5-pills').innerHTML=FRIENDS.map(p=>'<button class="pill'+(p.tag===t5AP?' active':'')+'" data-tag="'+p.tag+'" onclick="t5Sel(this)">'+p.tag+'</button>').join('');}
+function t5Sel(el){t5AP=el.dataset.tag;document.querySelectorAll('#t5-pills .pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');t5Render();}
+function t5Render(){const srch=document.getElementById('t5-search').value.toLowerCase();const filt=document.getElementById('t5-filter').value;const pl=FRIENDS.find(p=>p.tag===t5AP);if(!pl){document.getElementById('t5-tbody').innerHTML='';return;}let rows=pl.friends.filter(r=>{if(srch&&!r.name.toLowerCase().includes(srch))return false;if(filt&&r.status!==filt)return false;return true;});rows=[...rows].sort((a,b)=>{if(t5SC==='name')return t5SA?a.name.localeCompare(b.name):b.name.localeCompare(a.name);if(t5SC==='days_since'){const av=a.days_since!=null?a.days_since:999999,bv=b.days_since!=null?b.days_since:999999;return t5SA?av-bv:bv-av;}if(t5SC==='last_aided'||t5SC==='friend_since'){const av=a[t5SC]||'',bv=b[t5SC]||'';return t5SA?av.localeCompare(bv):bv.localeCompare(av);}return 0;});const inactive=rows.filter(r=>r.status==='inactive').length;document.getElementById('t5-count').textContent=rows.length+' friends'+(inactive?' — '+inactive+' inactive':'');document.getElementById('t5-tbody').innerHTML=rows.map(r=>{const sc=r.friend_since?'<span class="v" style="font-size:.75rem;color:var(--text2)">'+r.friend_since+'</span>':'<span class="zero">—</span>';const la=r.last_aided?'<span class="v" style="font-size:.75rem;color:var(--text2)">'+r.last_aided+'</span>':'<span class="zero">—</span>';const dc=r.days_since;const dcCol=dc==null?'zero':r.status==='inactive'?'v-att':dc<7?'v-green':'v-gold';const daysL=dc!=null?'<span class="v '+dcCol+'">'+dc+'d</span>':'<span class="zero">—</span>';const stCol=r.status==='inactive'?'var(--red)':r.status==='new'?'var(--teal)':'var(--green)';const stLabel=r.status==='inactive'?'Inactive':r.status==='new'?'New':'Active';const stL='<span style="font-family:monospace;font-size:.75rem;color:'+stCol+'">'+stLabel+'</span>';return'<tr><td class="bn">'+r.name+'</td><td>'+sc+'</td><td>'+la+'</td><td>'+daysL+'</td><td>'+stL+'</td></tr>';}).join('');}
+function t5ColSort(c){if(t5SC===c)t5SA=!t5SA;else{t5SC=c;t5SA=false;}t5Render();}
+t5Init();t5Render();
+<\/script>
+</body>
+</html>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════════════════════════════════
+loadCSV();
+</script>
+</body>
+</html>
