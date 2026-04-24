@@ -36,6 +36,61 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-
   border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;}
 .tab-btn:hover{color:var(--text2);}
 .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+/* Option A: blue = live city/personal tabs · amber = reference/DB tabs */
+.tab-btn.tab-ref{color:#7a6020;}
+.tab-btn.tab-ref:hover,.tab-btn.tab-ref.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-btn.tab-city{color:#2d5070;}
+.tab-btn.tab-city:hover,.tab-btn.tab-city.active{color:var(--blue2);border-bottom-color:var(--blue);}
+/* Event Targets tab styles */
+.et-wrap{padding:.5rem 0 2rem;}
+.et-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
+.et-title-grp h2{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--gold);text-transform:uppercase;}
+.et-title-grp p{color:var(--text2);font-size:.8rem;margin-top:2px;}
+.et-badge{background:rgba(240,180,41,.1);border:1px solid rgba(240,180,41,.3);border-radius:6px;padding:4px 12px;font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--gold);}
+.et-filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
+.et-fbtn{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 14px;font-family:'Exo 2',sans-serif;font-size:.8rem;color:var(--text3);cursor:pointer;transition:all .15s;}
+.et-fbtn:hover{color:var(--text);}
+.et-fbtn.active{background:rgba(240,180,41,.12);border-color:rgba(240,180,41,.4);color:var(--gold);}
+.et-summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem;}
+.et-stat{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;}
+.et-stat-lbl{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text3);margin-bottom:4px;letter-spacing:.05em;}
+.et-stat-val{font-size:1.6rem;font-weight:700;font-family:'Rajdhani',sans-serif;}
+.et-stat-val.need{color:var(--red);}
+.et-stat-val.met{color:var(--green);}
+.et-stat-val.amber{color:var(--gold);}
+.et-section{margin-bottom:1.25rem;}
+.et-evt-hdr{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(240,180,41,.25);cursor:pointer;user-select:none;margin-bottom:0;}
+.et-evt-icon{font-size:1rem;width:22px;text-align:center;}
+.et-evt-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:600;color:var(--gold);}
+.et-evt-date{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text3);}
+.et-evt-pill{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.65rem;padding:2px 8px;border-radius:10px;font-weight:600;}
+.pill-up{background:rgba(240,180,41,.1);color:var(--gold);border:1px solid rgba(240,180,41,.3);}
+.pill-past{background:var(--bg3);color:var(--text3);border:1px solid var(--border);}
+.et-chevron{font-size:.7rem;color:var(--text3);margin-left:6px;transition:transform .2s;}
+.et-chevron.open{transform:rotate(90deg);}
+.et-table-wrap{overflow-x:auto;}
+.et-table{width:100%;border-collapse:collapse;font-size:.8rem;}
+.et-table th{background:var(--bg3);position:sticky;top:0;z-index:2;font-family:'Share Tech Mono',monospace;font-size:.63rem;letter-spacing:.06em;color:var(--text3);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.et-table th.c{text-align:center;}
+.et-table td{padding:7px 10px;border-bottom:1px solid rgba(30,45,69,.35);vertical-align:middle;}
+.et-table tr:last-child td{border-bottom:none;}
+.et-table tr:hover td{background:rgba(240,180,41,.03);}
+.bldg-name{color:var(--text);font-weight:600;font-size:.82rem;}
+.bldg-sub{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--text3);margin-top:2px;line-height:1.4;}
+.bldg-note{font-size:.7rem;color:rgba(240,180,41,.6);font-style:italic;margin-top:2px;}
+.cnt{text-align:center;font-family:'Share Tech Mono',monospace;font-size:.82rem;}
+.cnt-zero{color:var(--text3);}
+.cnt-val{color:var(--text);}
+.cnt-total{color:var(--gold);font-weight:600;}
+.et-target-inp{width:44px;text-align:center;font-size:.8rem;background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.3);border-radius:4px;color:var(--gold);padding:3px 4px;font-family:'Share Tech Mono',monospace;}
+.et-target-inp:focus{outline:none;border-color:var(--gold);}
+.et-prog-wrap{display:inline-block;width:52px;background:var(--bg3);border-radius:3px;height:6px;border:1px solid var(--border);vertical-align:middle;}
+.et-prog-fill{height:100%;border-radius:2px;background:rgba(240,180,41,.6);}
+.et-prog-fill.full{background:var(--green);}
+.et-pct{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text3);margin-left:4px;}
+.s-need{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.68rem;padding:2px 8px;border-radius:10px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.s-met{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.68rem;padding:2px 8px;border-radius:10px;background:rgba(20,184,166,.1);color:var(--teal);border:1px solid rgba(20,184,166,.25);}
+.s-exc{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.68rem;padding:2px 8px;border-radius:10px;background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.25);}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
 .info-box{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--teal);
@@ -130,11 +185,13 @@ tr:hover td{background:rgba(59,130,246,.04);}
 </div>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('t1',this)">&#9876; Boost Reference</button>
-  <button class="tab-btn" onclick="switchTab('t2',this)">&#9876; Battle Boosts</button>
-  <button class="tab-btn" onclick="switchTab('t3',this)">&#127963; GB Planner</button>
-  <button class="tab-btn" onclick="switchTab('t4',this)">&#129512; Fragment Tracker</button>
-  <button class="tab-btn" onclick="switchTab('t5',this)">&#128101; Friend Manager</button>
+  <button class="tab-btn tab-ref active" onclick="switchTab('t1',this)">&#9876; Boost Reference</button>
+  <button class="tab-btn tab-ref" onclick="switchTab('t2',this)">&#9876; Battle Boosts</button>
+  <button class="tab-btn tab-ref" onclick="switchTab('t6',this)">&#127919; Event Targets</button>
+  <button class="tab-btn tab-city" onclick="switchTab('t3',this)">&#127963; GB Planner</button>
+  <button class="tab-btn tab-city" onclick="switchTab('t4',this)">&#129512; Fragment Tracker</button>
+  <button class="tab-btn tab-city" onclick="switchTab('t5',this)">&#128101; Friend Manager</button>
+  <button class="tab-btn tab-help" onclick="switchTab('t7',this)" style="margin-left:auto;color:#6b7e99;">&#10067; Help</button>
 </div>
 
 <!-- TAB 1 ─────────────────────────────────────────────────────────────────── -->
@@ -413,6 +470,189 @@ tr:hover td{background:rgba(59,130,246,.04);}
 </table></div>
 </div>
 
+<!-- TAB 6 ─────────────────────────────────────────────────────────────────── -->
+<div id="t6" class="tab-panel">
+<div class="et-wrap">
+  <div class="et-header">
+    <div class="et-title-grp">
+      <h2>&#127919; Event Targets</h2>
+      <p>+1 per event &times; 4&ndash;5 years = Ghostr's city &nbsp;&middot;&nbsp; <em>Adjust targets inline — defaults to current&nbsp;+&nbsp;1</em></p>
+    </div>
+    <div class="et-badge" id="et-badge">Loading...</div>
+  </div>
+  <div class="et-summary-row">
+    <div class="et-stat"><div class="et-stat-lbl">BUILDINGS TRACKED</div><div class="et-stat-val amber" id="et-s-total">—</div></div>
+    <div class="et-stat"><div class="et-stat-lbl">NEED THIS EVENT</div><div class="et-stat-val need" id="et-s-need">—</div></div>
+    <div class="et-stat"><div class="et-stat-lbl">TARGET MET</div><div class="et-stat-val met" id="et-s-met">—</div></div>
+    <div class="et-stat"><div class="et-stat-lbl">EXCEEDED</div><div class="et-stat-val met" id="et-s-exc">—</div></div>
+  </div>
+  <div class="et-filter-row">
+    <button class="et-fbtn active" onclick="etFilter('all',this)">All events</button>
+    <button class="et-fbtn" onclick="etFilter('need',this)">Need only</button>
+    <button class="et-fbtn" onclick="etFilter('upcoming',this)">Upcoming</button>
+  </div>
+  <div id="et-container"></div>
+</div>
+</div>
+
+
+<!-- TAB 7 ─────────────────────────────────────────────────────────────────── -->
+<div id="t7" class="tab-panel">
+<div style="max-width:860px;padding:1rem 0 3rem;">
+
+<div style="margin-bottom:2rem;">
+  <h2 style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--gold);text-transform:uppercase;margin-bottom:.4rem;">&#10067; User Manual</h2>
+  <p style="color:var(--text2);font-size:.85rem;">Geo-Meskin's FoE Community INFO Dashboard &mdash; Sessions 9&ndash;10 build &middot; April 2026</p>
+</div>
+
+<div style="display:grid;gap:1rem;margin-bottom:2rem;">
+
+  <!-- COLOR CODING -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#127752; Tab Color System (Option A)</h3>
+    <p style="color:var(--text2);font-size:.84rem;margin-bottom:.75rem;">One glance at the tab color tells you what kind of data you're looking at:</p>
+    <div style="display:flex;flex-direction:column;gap:.5rem;">
+      <div style="display:flex;align-items:center;gap:.75rem;font-size:.84rem;">
+        <span style="width:14px;height:14px;border-radius:2px;background:var(--gold);flex-shrink:0;"></span>
+        <span style="color:var(--gold);font-weight:600;min-width:120px;">Amber / Gold</span>
+        <span style="color:var(--text2);">Reference &amp; database tabs — <em>Boost Reference, Battle Boosts, Event Targets</em>. Game data, not your personal city data.</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem;font-size:.84rem;">
+        <span style="width:14px;height:14px;border-radius:2px;background:var(--blue);flex-shrink:0;"></span>
+        <span style="color:var(--blue2);font-weight:600;min-width:120px;">Blue</span>
+        <span style="color:var(--text2);">Personal city tabs — <em>GB Planner, Fragment Tracker, Friend Manager</em>. Your data from MEGAexports.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOST REFERENCE -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#9876; Boost Reference</h3>
+    <p style="color:var(--text2);font-size:.84rem;line-height:1.7;margin-bottom:.5rem;">Shows all 700+ event buildings ranked by total boost output. Boost values automatically adjust to your selected era — a building worth 30% att in Bronze Age might give 265% in Space Hub.</p>
+    <ul style="color:var(--text2);font-size:.83rem;line-height:1.9;padding-left:1.2rem;">
+      <li><strong style="color:var(--text);">ERA selector</strong> — always set this to your current age for accurate values</li>
+      <li><strong style="color:var(--text);">Sort columns</strong> — click any header to sort; click again to reverse</li>
+      <li><strong style="color:var(--text);">Filter by type</strong> — Event buildings only, GBG-focused, or Guild Expedition</li>
+      <li><strong style="color:var(--text);">Filter by event</strong> — drill into a specific event's buildings</li>
+      <li><strong style="color:var(--text);">Pt column</strong> — total boost per tile; useful for space-constrained cities</li>
+      <li><strong style="color:var(--text);">Data accuracy</strong> — ~80&ndash;90% accurate; patches and rebalancing happen. Wyldfyre corrections are gold.</li>
+    </ul>
+  </div>
+
+  <!-- BATTLE BOOSTS -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#9876; Battle Boosts</h3>
+    <p style="color:var(--text2);font-size:.84rem;line-height:1.7;margin-bottom:.5rem;">Curated battle boost reference by Wyldfyre (guild rank #2). Four combat contexts, each with different boost values for the same building:</p>
+    <ul style="color:var(--text2);font-size:.83rem;line-height:1.9;padding-left:1.2rem;">
+      <li><strong style="color:var(--red);">Open World</strong> — regular map battles and neighbor attacks</li>
+      <li><strong style="color:var(--teal);">Guild Expedition (GEx)</strong> — weekly GE encounters</li>
+      <li><strong style="color:var(--blue2);">GBG</strong> — Guild Battlegrounds (most important for active fighters)</li>
+      <li><strong style="color:var(--purple);">QI</strong> — Quantum Incursion</li>
+      <li><strong style="color:var(--text);">AAA / DAA / ADA / DDA</strong> — Att for Attacking Army / Def for Attacking Army / Att for Defending Army / Def for Defending Army</li>
+    </ul>
+  </div>
+
+  <!-- EVENT TARGETS -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#127919; Event Targets</h3>
+    <p style="color:var(--text2);font-size:.84rem;line-height:1.7;margin-bottom:.6rem;"><strong style="color:var(--gold);">The +1 Philosophy:</strong> Get one more of each priority building every event. Do that for 4&ndash;5 years and you end up with Ghostr's city. Simple.</p>
+    <ul style="color:var(--text2);font-size:.83rem;line-height:1.9;padding-left:1.2rem;margin-bottom:.75rem;">
+      <li><strong style="color:var(--text);">PMTHS / CTHG / Inv columns</strong> — fully editable. Click any number and type your real count. Total and Status update instantly.</li>
+      <li><strong style="color:var(--text);">Target column</strong> — also editable. Defaults to your current total + 1. Override any building to a specific goal.</li>
+      <li><strong style="color:var(--text);">Status badges</strong> — <span style="color:var(--red);">Need</span> = below target &nbsp;·&nbsp; <span style="color:var(--teal);">Met</span> = at target &nbsp;·&nbsp; <span style="color:var(--green);">Exceeded</span> = above target</li>
+      <li><strong style="color:var(--text);">Filters</strong> — All Events / Need Only (your shopping list) / Upcoming (what's coming soon)</li>
+      <li><strong style="color:var(--text);">Collapsible sections</strong> — click any event header to collapse/expand</li>
+    </ul>
+    <p style="color:var(--text3);font-size:.8rem;font-style:italic;">Note: Counts are not saved between browser sessions — the MEGAexport does not include live city inventory data. Update counts each session or after major changes.</p>
+    <div style="margin-top:.75rem;padding:.75rem 1rem;background:rgba(240,180,41,.06);border:1px solid rgba(240,180,41,.2);border-radius:6px;font-size:.82rem;color:var(--text2);">
+      <strong style="color:var(--gold);">Growing the list:</strong> New buildings get added after each event. Use the Beta city workflow (log in during Beta, browse the Event Shop, export MEGAexport, upload here) to get building stats <em>before</em> the live event launches.
+    </div>
+  </div>
+
+  <!-- GB PLANNER -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--blue2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#127963; GB Planner</h3>
+    <p style="color:var(--text2);font-size:.84rem;line-height:1.7;">Shows Great Building levels and FP cost to next level for each player, pulled from MEGAexport data. <em>Currently configured for personal city pages (PMTHS, CTHG, etc.) — not populated in the community dashboard.</em></p>
+  </div>
+
+  <!-- FRAGMENT TRACKER -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--blue2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#129512; Fragment Tracker</h3>
+    <p style="color:var(--text2);font-size:.84rem;line-height:1.7;margin-bottom:.5rem;">Tracks fragment progress toward building assembly. Shows frags collected, frags needed, historical rate (frags/day), and estimated completion date.</p>
+    <ul style="color:var(--text2);font-size:.83rem;line-height:1.9;padding-left:1.2rem;">
+      <li><strong style="color:var(--text);">Frags/Day</strong> — calculated from your historical accumulation rate via GEx, quests &amp; events. Excludes shop purchases.</li>
+      <li><strong style="color:var(--orange);">Known gap:</strong> QI Shop fragment purchases are NOT recorded in the FoE Helper export and won't appear here. If in-game totals don't match, QI shop purchases are likely the cause.</li>
+      <li><strong style="color:var(--orange);">Known gap:</strong> QI Seasonal Kit fragments (Spring/Summer/Autumn Epic Selection Kits) are also not captured.</li>
+    </ul>
+  </div>
+
+  <!-- FRIEND MANAGER -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--blue2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#128101; Friend Manager</h3>
+    <p style="color:var(--text2);font-size:.84rem;line-height:1.7;margin-bottom:.5rem;">Shows all friends seen in your event history with their last aid date and activity status.</p>
+    <ul style="color:var(--text2);font-size:.83rem;line-height:1.9;padding-left:1.2rem;">
+      <li><strong style="color:var(--red);">Inactive</strong> — no aid in 14+ days; candidates to drop</li>
+      <li><strong style="color:var(--teal);">New</strong> — added within last 14 days; give them time</li>
+      <li><strong style="color:var(--green);">Active</strong> — aided within 14 days</li>
+      <li>Friends with no recorded aid may predate your FoE Helper history</li>
+    </ul>
+  </div>
+
+  <!-- UPDATING THE DASHBOARD -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#128260; Keeping the Dashboard Current</h3>
+    <div style="color:var(--text2);font-size:.84rem;line-height:1.9;">
+      <p style="margin-bottom:.6rem;"><strong style="color:var(--text);">MEGAexport update workflow</strong> (Fragment Tracker, Friend Manager, GB Planner):</p>
+      <ol style="padding-left:1.4rem;margin-bottom:.9rem;">
+        <li>Open FoE Helper in your browser while logged into the city</li>
+        <li>Go to Settings &rarr; Export &rarr; MEGAexport</li>
+        <li>Upload the ZIP to Claude with the current dashboard HTML</li>
+        <li>Claude parses and regenerates the relevant data arrays</li>
+      </ol>
+      <p style="margin-bottom:.6rem;"><strong style="color:var(--text);">Beta city early-data workflow</strong> (new event buildings before live launch):</p>
+      <ol style="padding-left:1.4rem;margin-bottom:.9rem;">
+        <li>Event launches in Beta server</li>
+        <li>Log into Beta city, open the Event Shop, scroll through all buildings</li>
+        <li>Click building detail popups especially for leveled/tiered buildings</li>
+        <li>Run MEGAexport from Beta city</li>
+        <li>Upload to Claude &rarr; new buildings added to Boost Reference + Event Targets</li>
+        <li>Done before live event even launches!</li>
+      </ol>
+      <p style="color:var(--text3);font-size:.8rem;font-style:italic;">Data accuracy is ~80&ndash;90%. Building stats change with patches and rebalancing. Beta &rarr; Live differences happen. Wyldfyre corrections are the most reliable source for battle boost data.</p>
+    </div>
+  </div>
+
+  <!-- KEY REMINDERS -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#128197; Calendar Reminders</h3>
+    <div style="display:grid;gap:.4rem;font-size:.84rem;">
+      <div style="display:flex;gap:1rem;"><span style="color:var(--text3);min-width:100px;">Oct 1, 2026</span><span style="color:var(--text2);">&#127875; Halloween &mdash; Boo'loon Grand Gala (5&times;5 &middot; 1,320+ boost)</span></div>
+      <div style="display:flex;gap:1rem;"><span style="color:var(--text3);min-width:100px;">Nov 1, 2026</span><span style="color:var(--text2);">&#127800; Fellowship &mdash; Everblossom Fiore Village kits &mdash; BOTH cities! (90-day timer!)</span></div>
+      <div style="display:flex;gap:1rem;"><span style="color:var(--text3);min-width:100px;">Dec 1, 2026</span><span style="color:var(--text2);">&#10052; Winter &mdash; Nutcracker Guardhouse (Mass Self Aid Kit frags &middot; stack as many as possible!)</span></div>
+      <div style="display:flex;gap:1rem;"><span style="color:var(--text3);min-width:100px;">Apr 1, 2027</span><span style="color:var(--text2);">&#127874; Anniversary &mdash; Mk III Null Anomaly Extractor + Platinum World Expo</span></div>
+    </div>
+  </div>
+
+  <!-- FILES -->
+  <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--text3);border-radius:8px;padding:1.25rem 1.5rem;">
+    <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#128193; Key Files</h3>
+    <div style="display:grid;gap:.35rem;font-size:.82rem;font-family:'Share Tech Mono',monospace;">
+      <div style="display:flex;gap:1rem;"><span style="color:var(--text3);min-width:160px;">Community Dashboard</span><span style="color:var(--teal);">index.html (this file)</span></div>
+      <div style="display:flex;gap:1rem;"><span style="color:var(--text3);min-width:160px;">Community Tool</span><span style="color:var(--teal);">FoE_Best_Buildings_Community_20260416.html</span></div>
+      <div style="display:flex;gap:1rem;"><span style="color:var(--text3);min-width:160px;">Master Summary</span><span style="color:var(--teal);">PMTHS-CTHG_Master_Summary_v6_20260422.html</span></div>
+      <div style="display:flex;gap:1rem;"><span style="color:var(--text3);min-width:160px;">Live Community URL</span><span style="color:var(--teal);">geomeskin.github.io/FoE_Community_INFO/</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center;color:var(--text3);font-size:.78rem;font-style:italic;padding-top:1rem;border-top:1px solid var(--border);">
+  Geo-Meskin's Empire &middot; Sessions 9&ndash;10 &middot; April 2026 &middot; Claude Sonnet &nbsp;&middot;&nbsp; Go Astros! &#9918;&#127942;
+</div>
+
+</div>
+</div>
+
 <div class="footer">
   Data sourced from FoE Helper MegaExports — community reference only. Not affiliated with InnoGames.<br>
   Battle boost data curated by Wyldfyre. &mdash;
@@ -676,6 +916,195 @@ function t5ColSort(c){
 }
 t5Init();
 t5Render();
+
+// ══════════════════════════════════════════════════════════════ TAB 6 — EVENT TARGETS
+const ET_EVENTS = [
+  {
+    id:'winter', name:'Winter event', icon:'❄', date:'Dec 2026', upcoming:true,
+    buildings:[
+      {id:'nug', name:'Nutcracker Guardhouse', size:'2×2', stats:'+10% RED att · 2 Mass Self Aid Kit frags/day', note:'3 guardhouses = 1 kit every 5 days — stack as many as possible!', pmths:0, cthg:3, inv:0},
+    ]
+  },
+  {
+    id:'halloween', name:'Halloween event', icon:'🎃', date:'Oct 2026', upcoming:true,
+    buildings:[
+      {id:'bgg', name:"Boo'loon Grand Gala", size:'5×5', stats:'+238% att · +238% def · +358% GBG att/def · 1,320+ total', note:'Top Halloween building — target both cities', pmths:0, cthg:0, inv:0},
+      {id:'rby', name:'Rattlebones Raveyard', size:'?', stats:'+100% att/def · +185% all contexts · top 5 BG double collector', note:'Keep despite -114k score (-15,940 pop)', pmths:0, cthg:1, inv:0},
+    ]
+  },
+  {
+    id:'fellowship', name:'Fellowship event', icon:'🌸', date:'Nov 2026', upcoming:true,
+    buildings:[
+      {id:'efv', name:'Everblossom Fiore Village', size:'6×4', stats:'+137% att · +197% def · +324% GBG att/def · total 858', note:'⚠ Kit expires in 90 days — grab BOTH cities this event!', pmths:0, cthg:0, inv:0},
+    ]
+  },
+  {
+    id:'anniversary', name:'Anniversary event', icon:'🎂', date:'Apr 2027', upcoming:true,
+    buildings:[
+      {id:'mknae', name:'Mk III Null Anomaly Extractor', size:'6×3', stats:'+341% att · +341% def at SASSh era', note:'Calendar reminder Apr 1, 2027', pmths:0, cthg:0, inv:0},
+      {id:'pwe', name:'Platinum World Expo', size:'4×6', stats:'High-tier World Expo — both cities priority', note:'Check updated stats at event launch', pmths:0, cthg:0, inv:0},
+    ]
+  },
+  {
+    id:'ge_ongoing', name:'Guild Expeditions (ongoing)', icon:'⚔', date:'Weekly', upcoming:true,
+    buildings:[
+      {id:'ft', name:'Forgotten Temple (Active)', size:'4×3', stats:'+90% Att/Def att army · +100% def army · +250% GBG att/def', note:'50 frags/week at Trial 9 · 200 frags = 1 temple · PMTHS 190/200 — ACTIVATE NOW!', pmths:0, cthg:0, inv:4},
+    ]
+  },
+  {
+    id:'gr_ongoing', name:'Guild Raids (ongoing)', icon:'🏟', date:'Ongoing', upcoming:true,
+    buildings:[
+      {id:'nle', name:'Neo Lunara Emporium', size:'4×5', stats:'+315% att/def · 1,956 total · GE focused', note:'Goal: ×4 Lunara Emporium (like Ghostr!) · 3 planted + inventory building', pmths:0, cthg:3, inv:1},
+      {id:'nse', name:'Neo Solara Emporium', size:'4×5', stats:'+225/225 att/def · +143/143 GBG att/def · 1,542 total · GBG focused', note:'Goal: ×4 Solara Emporium · start first stack after Golden kit frags (140/1000 → ~1 week)', pmths:0, cthg:0, inv:0},
+      {id:'nlb', name:'Neo Lunara Bazaar', size:'4×5', stats:'+400% att/def · GE focused · stepping stone to Emporium', note:'3 in CTHG currently', pmths:0, cthg:3, inv:0},
+    ]
+  },
+  {
+    id:'summer2025', name:'Summer event (past)', icon:'🌞', date:'Summer 2025', upcoming:false,
+    buildings:[
+      {id:'ccp', name:"Cap'n Coconut Paradise", size:'3×1', stats:'+18% RED att · +18% GBG RED per building (3×1!)', note:'5 planted in CTHG this session · excellent per-tile ratio', pmths:0, cthg:5, inv:0},
+    ]
+  },
+  {
+    id:'wildlife2025', name:'Wildlife event (past)', icon:'🦌', date:'Spring 2025', upcoming:false,
+    buildings:[
+      {id:'momiji', name:'Momijidori Shrine (Shika max tier)', size:'3×8', stats:'+152% att · +152% def · +73% att/def GBG · total 430+', note:'Epic Wildlife Kit in inventory → future Momijidori! Wait for SAAB redesign.', pmths:0, cthg:1, inv:1},
+    ]
+  },
+  {
+    id:'winter2024', name:'Winter event (past)', icon:'❄', date:'Winter 2024', upcoming:false,
+    buildings:[
+      {id:'slp', name:'Sled Pup Monument', size:'3×2', stats:'+28% all att/def contexts · 15 FP + 12 units/day', note:'Strong all-rounder · 1 in CTHG · keep', pmths:0, cthg:1, inv:0},
+    ]
+  },
+  {
+    id:'summer2024', name:'Summer event (past)', icon:'🐉', date:'Summer 2024', upcoming:false,
+    buildings:[
+      {id:'cdb', name:"Crimson Dragon's Breath", size:'4×6', stats:'+65% att · +39% def · +101% GBG att · +57% GBG def · total 262', note:'2 in CTHG inventory — plant after SAAB redesign', pmths:0, cthg:0, inv:2},
+    ]
+  },
+  {
+    id:'misc', name:'Permanent / diamond farm', icon:'💎', date:'Anytime', upcoming:false,
+    buildings:[
+      {id:'foy', name:'Fountain of Youth', size:'3×3', stats:'Daily random: 1% chance 50 diamonds · 10% FP · goods · coins', note:'⚡ 20 in PMTHS inventory doing nothing! Plant ASAP in post-SAAB redesign.', pmths:7, cthg:7, inv:20},
+      {id:'lww', name:'Little Wishing Well', size:'?', stats:'Diamond farm — permanent building', note:'5 in PMTHS · 3 in CTHG currently', pmths:5, cthg:3, inv:0},
+    ]
+  },
+];
+
+let etTargets={};
+let etFilter_='all';
+let etCollapsed={};
+
+const etCounts={};
+function etGet(b,f){return etCounts[b.id]&&etCounts[b.id][f]!==undefined?etCounts[b.id][f]:(b[f]||0);}
+function etTotal(b){return etGet(b,'pmths')+etGet(b,'cthg');}
+function etWithInv(b){return etGet(b,'pmths')+etGet(b,'cthg')+etGet(b,'inv');}
+function etTarget(b){return etTargets[b.id]!==undefined?etTargets[b.id]:etTotal(b)+1;}
+function etSetCount(id,field,val){if(!etCounts[id])etCounts[id]={};etCounts[id][field]=Math.max(0,parseInt(val)||0);etRender();}
+function etStatus(b){
+  const t=etTarget(b),tot=etWithInv(b);
+  if(tot>t)return'exc';
+  if(tot>=t)return'met';
+  return'need';
+}
+
+function etUpdateSummary(){
+  let total=0,need=0,met=0,exc=0;
+  ET_EVENTS.forEach(ev=>ev.buildings.forEach(b=>{
+    total++;
+    const s=etStatus(b);
+    if(s==='need')need++;else if(s==='met')met++;else exc++;
+  }));
+  document.getElementById('et-s-total').textContent=total;
+  document.getElementById('et-s-need').textContent=need;
+  document.getElementById('et-s-met').textContent=met;
+  document.getElementById('et-s-exc').textContent=exc;
+  document.getElementById('et-badge').textContent=need+' building'+(need===1?'':'s')+' to acquire';
+}
+
+function etRender(){
+  const container=document.getElementById('et-container');
+  container.innerHTML='';
+  ET_EVENTS.forEach(ev=>{
+    const bldgs=etFilter_==='need'?ev.buildings.filter(b=>etStatus(b)==='need')
+               :etFilter_==='upcoming'&&!ev.upcoming?null
+               :ev.buildings;
+    if(!bldgs||bldgs.length===0)return;
+    const isOpen=etCollapsed[ev.id]!==false;
+    const sec=document.createElement('div');
+    sec.className='et-section';
+    const rows=bldgs.map(b=>{
+      const tot=etWithInv(b),tgt=etTarget(b);
+      const pct=Math.min(100,Math.round(tot/Math.max(tgt,1)*100));
+      const s=etStatus(b);
+      const sBadge=s==='need'?'<span class="s-need">Need</span>':s==='met'?'<span class="s-met">Met</span>':'<span class="s-exc">Exceeded</span>';
+      const barClass=pct>=100?'full':'';
+      return`<tr>
+        <td><div class="bldg-name">${b.name}</div>
+          ${b.size&&b.size!=='?'?`<span class="bldg-sub">${b.size} &nbsp;·&nbsp; </span>`:''}
+          <span class="bldg-sub">${b.stats}</span>
+          ${b.note?`<div class="bldg-note">${b.note}</div>`:''}
+        </td>
+        <td class="cnt"><input class="et-target-inp" type="number" min="0" value="${etGet(b,'pmths')}" onchange="etSetCount('${b.id}','pmths',this.value)" style="color:var(--blue2);border-color:rgba(125,211,252,.3);background:rgba(59,130,246,.06)"></td>
+        <td class="cnt"><input class="et-target-inp" type="number" min="0" value="${etGet(b,'cthg')}" onchange="etSetCount('${b.id}','cthg',this.value)" style="color:var(--blue2);border-color:rgba(125,211,252,.3);background:rgba(59,130,246,.06)"></td>
+        <td class="cnt"><input class="et-target-inp" type="number" min="0" value="${etGet(b,'inv')}" onchange="etSetCount('${b.id}','inv',this.value)" style="color:var(--text2);border-color:var(--border2)"></td>
+        <td class="cnt"><span class="cnt-total">${tot}</span></td>
+        <td class="cnt"><input class="et-target-inp" type="number" min="0" value="${tgt}" onchange="etSetTarget('${b.id}',this.value)"></td>
+        <td class="cnt">
+          <div class="et-prog-wrap"><div class="et-prog-fill ${barClass}" style="width:${pct}%"></div></div>
+          <span class="et-pct">${pct}%</span>
+        </td>
+        <td class="cnt">${sBadge}</td>
+      </tr>`;
+    }).join('');
+
+    sec.innerHTML=`
+      <div class="et-evt-hdr" onclick="etToggle('${ev.id}')">
+        <span class="et-evt-icon">${ev.icon}</span>
+        <span class="et-evt-name">${ev.name}</span>
+        <span class="et-evt-date">${ev.date}</span>
+        <span class="et-evt-pill ${ev.upcoming?'pill-up':'pill-past'}">${ev.upcoming?'UPCOMING':'PAST'}</span>
+        <span class="et-chevron ${isOpen?'open':''}" id="et-chev-${ev.id}">&#9658;</span>
+      </div>
+      <div id="et-body-${ev.id}" style="display:${isOpen?'block':'none'}">
+        <div class="et-table-wrap"><table class="et-table">
+          <thead><tr>
+            <th>Building</th>
+            <th class="c">PMTHS</th><th class="c">CTHG</th><th class="c">Inv</th>
+            <th class="c">Total</th><th class="c">Target</th>
+            <th class="c">Progress</th><th class="c">Status</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+      </div>`;
+    container.appendChild(sec);
+  });
+  etUpdateSummary();
+}
+
+function etToggle(id){
+  etCollapsed[id]=etCollapsed[id]===false?true:false;
+  const body=document.getElementById('et-body-'+id);
+  const chev=document.getElementById('et-chev-'+id);
+  const open=etCollapsed[id]!==false;
+  body.style.display=open?'block':'none';
+  chev.className='et-chevron'+(open?' open':'');
+}
+
+function etSetTarget(id,val){
+  etTargets[id]=Math.max(0,parseInt(val)||0);
+  etRender();
+}
+
+function etFilter(f,btn){
+  etFilter_=f;
+  document.querySelectorAll('.et-fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  etRender();
+}
+
+etRender();
 </script>
 </body>
 </html>
