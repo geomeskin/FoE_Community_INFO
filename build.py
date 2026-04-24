@@ -397,22 +397,20 @@ def build_gb_sections(players):
             mx  = gb["max_level"]
             pct = round(lv / mx * 100) if mx else 0
             fp  = gb["fp"]
-            at_max = gb["at_max"]
-            bar_color = "var(--text3)" if at_max else "var(--blue)"
             bar = (
                 f'<div class="fp-bar-wrap">'
-                f'<div class="fp-bar" style="width:{pct}%;background:{bar_color}"></div>'
+                f'<div class="fp-bar" style="width:{pct}%;background:var(--blue)"></div>'
                 f'</div>'
             )
+            lv_cell = f'<span class="v">{lv}</span><span class="sb">/{mx}</span>'
             fp_cell = (
-                '<span class="at-max">max</span>' if at_max
-                else f'<span class="v v-gold">{fp:,}</span>'
+                f'<span class="v v-gold">{fp:,}</span>' if fp
+                else '<span class="zero">\u2014</span>'
             )
             rows_html.append(
                 f'<tr>'
                 f'<td class="bn">{gb["name"]}</td>'
-                f'<td><span class="v">{lv}</span></td>'
-                f'<td><span class="v">{mx}</span></td>'
+                f'<td>{lv_cell}</td>'
                 f'<td>{bar} <span class="sb">{pct}%</span></td>'
                 f'<td>{fp_cell}</td>'
                 f'</tr>'
@@ -429,7 +427,7 @@ def build_gb_sections(players):
             f'<div class="table-wrap" style="border-radius:0 0 8px 8px">'
             f'<table>'
             f'<thead><tr>'
-            f'<th>GREAT BUILDING</th><th>LV</th><th>MAX</th>'
+            f'<th>GREAT BUILDING</th><th>LEVEL</th>'
             f'<th>PROGRESS</th><th>FP TO NEXT LV</th>'
             f'</tr></thead>'
             f'<tbody>{"".join(rows_html)}</tbody>'
