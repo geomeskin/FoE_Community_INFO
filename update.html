@@ -149,6 +149,9 @@ tr:hover td{background:rgba(59,130,246,.04);}
   color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:3px;
   padding:1px 5px;max-width:180px;overflow:hidden;text-overflow:ellipsis;}
 .no-data{color:var(--text3);font-style:italic;font-size:.78rem;}
+.new-badge{display:inline-block;font-size:.6rem;font-family:'Share Tech Mono',monospace;
+  color:#080c14;background:var(--green);border-radius:3px;padding:1px 5px;margin-left:5px;
+  font-weight:700;letter-spacing:.04em;vertical-align:middle;}
 .shop-tag{display:inline-block;font-size:.65rem;font-family:'Share Tech Mono',monospace;
   border-radius:3px;padding:1px 6px;border:1px solid;}
 .shop-Event{color:var(--gold);border-color:rgba(240,180,41,.3);background:rgba(240,180,41,.05);}
@@ -262,6 +265,7 @@ tr:hover td{background:rgba(59,130,246,.04);}
         <option value="event">Event buildings</option>
         <option value="gbg">GbG boost only</option>
         <option value="ge">Guild Expedition</option>
+        <option value="new">New this run</option>
       </select>
       <select class="ddl" id="t1-fevt" onchange="t1Render()">
         <option value="">All events</option>
@@ -739,6 +743,18 @@ async function runBuild() {
     logStatus(`\nTab 1: ${BEST.length} total boost buildings`, 'ok');
     logStatus(`Tab 2: ${bbRows.length} battle boost entries`, 'ok');
 
+    // Track new buildings
+    const tracking = updateKnownBuildings();
+    knownBuildings = tracking.known;
+    newBuildingIds = tracking.newOnes;
+    if (newBuildingIds.size > 0) {
+      logStatus(`🆕 ${newBuildingIds.size} NEW building(s) discovered this run!`, 'ok');
+    } else if (tracking.prevCount > 0) {
+      logStatus(`No new buildings since last run (DB: ${knownBuildings.size} known)`, '');
+    } else {
+      logStatus(`Building baseline saved — ${knownBuildings.size} buildings now tracked`, 'info');
+    }
+
     // Render all tabs
     buildEraSelector();
     buildEventSelector();
@@ -1107,6 +1123,36 @@ function switchTab(id, btn) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// Building DB — localStorage tracking for NEW badge
+// ═══════════════════════════════════════════════════════════════════════
+const LS_KEY = 'foe_known_buildings';
+
+function loadKnownBuildings() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch(e) { return new Set(); }
+}
+
+function saveKnownBuildings(ids) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify([...ids])); } catch(e) {}
+}
+
+function updateKnownBuildings() {
+  const known = loadKnownBuildings();
+  const prev = new Set(known);
+  const newOnes = [];
+  for (const b of BEST) {
+    if (!known.has(b.id)) { newOnes.push(b.id); known.add(b.id); }
+  }
+  saveKnownBuildings(known);
+  return { known, newOnes: new Set(newOnes), prevCount: prev.size };
+}
+
+let knownBuildings = new Set();
+let newBuildingIds = new Set();
+
+// ═══════════════════════════════════════════════════════════════════════
 // Tab 1 — Render
 // ═══════════════════════════════════════════════════════════════════════
 function buildEraSelector() {
@@ -1152,6 +1198,7 @@ function t1Render() {
     if (ft === 'event' && !b.evt) return false;
     if (ft === 'gbg' && b.ga === 0 && b.gd === 0) return false;
     if (ft === 'ge' && !(b.evt||'').includes('Guild Expedition')) return false;
+    if (ft === 'new' && !newBuildingIds.has(b.id)) return false;
     if (fe && b.evt !== fe) return false;
     return true;
   });
@@ -1161,13 +1208,16 @@ function t1Render() {
     return t1SA ? (a[t1SC]||0)-(b[t1SC]||0) : (b[t1SC]||0)-(a[t1SC]||0);
   });
   document.getElementById('t1-count').textContent = rows.length + ' buildings';
+  const newCount = rows.filter(b => newBuildingIds.has(b.id)).length;
+  if (newCount > 0) document.getElementById('t1-count').textContent += ` — ${newCount} NEW`;
   const fv = (v,c) => v > 0 ? `<span class="v ${c}">${v}%</span>` : '<span class="zero">—</span>';
   document.getElementById('t1-tbody').innerHTML = rows.map((b,i) => {
     const rk = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
     const tc = b.hd ? `<span class="v v-gold">${b.tot.toLocaleString()}</span>` : '<span class="no-data">no era data</span>';
     const pc = b.hd && b.pt > 0 ? `<span class="v v-gold">${b.pt}</span>` : '<span class="zero">—</span>';
+    const nb = newBuildingIds.has(b.id) ? '<span class="new-badge">NEW</span>' : '';
     return `<tr><td class="rank ${rk}">${i+1}</td>`
-      + `<td class="bn">${b.n}<span class="sb">${b.s}</span></td>`
+      + `<td class="bn">${b.n}${nb}<span class="sb">${b.s}</span></td>`
       + `<td>${tc}</td><td>${pc}</td>`
       + `<td>${fv(b.a,'v-att')}</td><td>${fv(b.d,'v-def')}</td>`
       + `<td>${fv(b.ga,'v-gbg')}</td><td>${fv(b.gd,'v-gbg')}</td>`
