@@ -749,10 +749,10 @@ async function runBuild() {
     newBuildingIds = tracking.newOnes;
     if (newBuildingIds.size > 0) {
       logStatus(`🆕 ${newBuildingIds.size} NEW building(s) discovered this run!`, 'ok');
-    } else if (tracking.prevCount > 0) {
-      logStatus(`No new buildings since last run (DB: ${knownBuildings.size} known)`, '');
+    } else if (tracking.isFirstRun) {
+      logStatus(`✅ Baseline saved — ${knownBuildings.size} buildings now tracked. NEW badges will appear on future runs.`, 'info');
     } else {
-      logStatus(`Building baseline saved — ${knownBuildings.size} buildings now tracked`, 'info');
+      logStatus(`No new buildings since last run (DB: ${knownBuildings.size} known)`, '');
     }
 
     // Render all tabs
@@ -1130,23 +1130,37 @@ const LS_KEY = 'foe_known_buildings';
 function loadKnownBuildings() {
   try {
     const raw = localStorage.getItem(LS_KEY);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    // Guard against old bad saves (indices instead of IDs)
+    if (parsed.length > 0 && typeof parsed[0] === 'number') {
+      localStorage.removeItem(LS_KEY);
+      return new Set();
+    }
+    return new Set(parsed);
   } catch(e) { return new Set(); }
 }
 
 function saveKnownBuildings(ids) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify([...ids])); } catch(e) {}
+  try {
+    const arr = Array.from(ids).filter(id => typeof id === 'string' && id.startsWith('W_'));
+    localStorage.setItem(LS_KEY, JSON.stringify(arr));
+  } catch(e) {}
 }
 
 function updateKnownBuildings() {
   const known = loadKnownBuildings();
+  const isFirstRun = known.size === 0;
   const prev = new Set(known);
   const newOnes = [];
   for (const b of BEST) {
-    if (!known.has(b.id)) { newOnes.push(b.id); known.add(b.id); }
+    if (!known.has(b.id)) { 
+      if (!isFirstRun) newOnes.push(b.id);
+      known.add(b.id); 
+    }
   }
   saveKnownBuildings(known);
-  return { known, newOnes: new Set(newOnes), prevCount: prev.size };
+  return { known, newOnes: new Set(newOnes), prevCount: prev.size, isFirstRun };
 }
 
 let knownBuildings = new Set();
