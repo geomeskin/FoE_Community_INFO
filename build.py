@@ -1138,49 +1138,6 @@ tr:hover td{background:rgba(59,130,246,.04);}
 </table></div>
 </div>
 
-<!-- TAB 6 ────────────────────────────────────────────────────────────────────────────── -->
-<div id="t6" class="tab-panel">
-<div class="info-box">
-  <strong>All Boost Buildings</strong> — complete set of buildings with combat boost values.
-  Open World boosts only (AAA/DAA/ADA/DDA). Pick your era — values update instantly.
-  <strong>AAA</strong> = Att for Attacking Army &nbsp;|&nbsp; <strong>DAA</strong> = Def for Attacking Army &nbsp;|&nbsp;
-  <strong>ADA</strong> = Att for Defending Army &nbsp;|&nbsp; <strong>DDA</strong> = Def for Defending Army.
-</div>
-<div class="toolbar">
-  <input class="search-box" id="t6-search" placeholder="Search building…" oninput="t6Render()">
-  <div class="era-wrap">
-    <span class="era-label">ERA:</span>
-    <select class="ddl era-sel" id="t6-era" onchange="t6Render()">
-%%ERA_OPTIONS%%
-    </select>
-  </div>
-  <select class="ddl" id="t6-sort" onchange="t6Render()">
-    <option value="tot">Sort: Total</option>
-    <option value="pt">Sort: Per Tile</option>
-    <option value="aaa">Sort: AAA</option>
-    <option value="daa">Sort: DAA</option>
-    <option value="ada">Sort: ADA</option>
-    <option value="dda">Sort: DDA</option>
-    <option value="n">Sort: Name</option>
-  </select>
-  <span class="count-label" id="t6-count"></span>
-</div>
-<div class="table-wrap"><table>
-<thead><tr>
-  <th>#</th>
-  <th onclick="t6ColSort('n')">BUILDING</th>
-  <th onclick="t6ColSort('tot')">TOTAL ▾</th>
-  <th onclick="t6ColSort('pt')">PT</th>
-  <th onclick="t6ColSort('aaa')">AAA</th>
-  <th onclick="t6ColSort('daa')">DAA</th>
-  <th onclick="t6ColSort('ada')">ADA</th>
-  <th onclick="t6ColSort('dda')">DDA</th>
-  <th>SIZE</th>
-</tr></thead>
-<tbody id="t6-tbody"></tbody>
-</table></div>
-</div>
-
 <div class="footer">
   Data sourced from FoE Helper MegaExports \u2014 community reference only. Not affiliated with InnoGames.<br>
   Battle boost data curated by Wyldfyre. &mdash;

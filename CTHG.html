@@ -414,70 +414,6 @@ tr:hover td{background:rgba(59,130,246,.04);}
 </table></div>
 </div>
 
-<!-- TAB 6 ────────────────────────────────────────────────────────────────────────────── -->
-<div id="t6" class="tab-panel">
-<div class="info-box">
-  <strong>All Boost Buildings</strong> — complete set of buildings with combat boost values.
-  Open World boosts only (AAA/DAA/ADA/DDA). Pick your era — values update instantly.
-  <strong>AAA</strong> = Att for Attacking Army &nbsp;|&nbsp; <strong>DAA</strong> = Def for Attacking Army &nbsp;|&nbsp;
-  <strong>ADA</strong> = Att for Defending Army &nbsp;|&nbsp; <strong>DDA</strong> = Def for Defending Army.
-</div>
-<div class="toolbar">
-  <input class="search-box" id="t6-search" placeholder="Search building…" oninput="t6Render()">
-  <div class="era-wrap">
-    <span class="era-label">ERA:</span>
-    <select class="ddl era-sel" id="t6-era" onchange="t6Render()">
-      <option value="1">Bronze Age</option>
-      <option value="2">Iron Age</option>
-      <option value="3">Early Middle Age</option>
-      <option value="4">High Middle Age</option>
-      <option value="5">Late Middle Age</option>
-      <option value="6">Colonial Age</option>
-      <option value="7">Industrial Age</option>
-      <option value="8">Progressive Era</option>
-      <option value="9">Modern Era</option>
-      <option value="10">Post-Modern Era</option>
-      <option value="11">Contemporary Era</option>
-      <option value="12">Tomorrow Era</option>
-      <option value="13">Future Era</option>
-      <option value="14">Arctic Future</option>
-      <option value="15">Oceanic Future</option>
-      <option value="16">Virtual Future</option>
-      <option value="17">Space Age: Mars</option>
-      <option value="18">Space Age: Asteroid Belt</option>
-      <option value="19">Space Age: Venus</option>
-      <option value="20">Space Age: Jupiter Moon</option>
-      <option value="21">Space Age: Titan</option>
-      <option value="22" selected>Space Age: Space Hub</option>
-    </select>
-  </div>
-  <select class="ddl" id="t6-sort" onchange="t6Render()">
-    <option value="tot">Sort: Total</option>
-    <option value="pt">Sort: Per Tile</option>
-    <option value="aaa">Sort: AAA</option>
-    <option value="daa">Sort: DAA</option>
-    <option value="ada">Sort: ADA</option>
-    <option value="dda">Sort: DDA</option>
-    <option value="n">Sort: Name</option>
-  </select>
-  <span class="count-label" id="t6-count"></span>
-</div>
-<div class="table-wrap"><table>
-<thead><tr>
-  <th>#</th>
-  <th onclick="t6ColSort('n')">BUILDING</th>
-  <th onclick="t6ColSort('tot')">TOTAL ▾</th>
-  <th onclick="t6ColSort('pt')">PT</th>
-  <th onclick="t6ColSort('aaa')">AAA</th>
-  <th onclick="t6ColSort('daa')">DAA</th>
-  <th onclick="t6ColSort('ada')">ADA</th>
-  <th onclick="t6ColSort('dda')">DDA</th>
-  <th>SIZE</th>
-</tr></thead>
-<tbody id="t6-tbody"></tbody>
-</table></div>
-</div>
-
 <div class="footer">
   Data sourced from FoE Helper MegaExports — community reference only. Not affiliated with InnoGames.<br>
   Battle boost data curated by Wyldfyre. &mdash;
@@ -603,7 +539,7 @@ function t2ColSort(c){
 t2Render();
 
 // ══════════════════════════════════════════════════════════════ TAB 4
-const FRAGS=[{"tag":"CTHG","fragments":[{"name":"Neo Checkmate Square Selection Kit","item_id":"selection_kit_GR25A","have":900,"need":1000,"pct":90.0,"assembled":3,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Guild Expedition 2 Kit","item_id":"selection_kit_gex2","have":60,"need":100,"pct":60.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.31,"days":130,"est":"2026-09-07"},{"name":"Guild Expedition 4 Kit","item_id":"selection_kit_gex4","have":60,"need":100,"pct":60.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.31,"days":130,"est":"2026-09-07"},{"name":"Wishing Well","item_id":"building_wishing_well","have":6,"need":15,"pct":40.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.03,"days":300,"est":"2027-02-24"},{"name":"QI Autumn 2025 Epic Selection Kit","item_id":"selection_kit_epic_GR25_3","have":400,"need":1000,"pct":40.0,"assembled":0,"in_progress":true,"complete":false,"fpd":2.1,"days":286,"est":"2027-02-10"},{"name":"Feathered Serpent Statue Chain Kit","item_id":"selection_kit_feathered_serpent_statue_chain","have":30,"need":100,"pct":30.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.16,"days":438,"est":"2027-07-12"},{"name":"Feathered Serpent Statue Selection Kit","item_id":"selection_kit_feathered_serpent_statue","have":50,"need":200,"pct":25.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.26,"days":577,"est":"2027-11-28"},{"name":"Neo Bazaar Golden Selection Kit","item_id":"golden_selection_kit_GR25C","have":240,"need":1000,"pct":24.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Forgotten Temple - Active","item_id":"building_forgotten_temple","have":40,"need":200,"pct":20.0,"assembled":1,"in_progress":true,"complete":false,"fpd":1.26,"days":127,"est":"2026-09-04"},{"name":"Fountain of Youth","item_id":"building_fountain_of_youth","have":145,"need":800,"pct":18.1,"assembled":0,"in_progress":true,"complete":false,"fpd":0.76,"days":862,"est":"2028-09-08"},{"name":"Boo\u2019loon Masquerade Carnival Silver Upgrade Kit","item_id":"silver_upgrade_kit_HAL25A","have":25,"need":150,"pct":16.7,"assembled":0,"in_progress":true,"complete":false,"fpd":0.13,"days":962,"est":"2028-12-17"},{"name":"Boo\u2019loon Grand Gala Golden Upgrade Kit","item_id":"golden_upgrade_kit_HAL25A","have":25,"need":150,"pct":16.7,"assembled":0,"in_progress":true,"complete":false,"fpd":0.13,"days":962,"est":"2028-12-17"},{"name":"Intelligence Relay Selection Kit","item_id":"selection_kit_GBG26D","have":75,"need":500,"pct":15.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Divine Sky Watch","item_id":"building_divine_sky_watch","have":15,"need":120,"pct":12.5,"assembled":0,"in_progress":true,"complete":false,"fpd":0.08,"days":1313,"est":"2029-12-03"},{"name":"Neo Colossus Selection Kit","item_id":"selection_kit_neo_colossus","have":120,"need":1000,"pct":12.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Fountain Of Youth Shrink Kit","item_id":"shrink_kit_fountain_of_youth","have":15,"need":800,"pct":1.9,"assembled":0,"in_progress":true,"complete":false,"fpd":0.08,"days":9813,"est":"2053-03-12"},{"name":"QI 2026 Middle Ages Epic Selection Kit 2","item_id":"selection_kit_epic_GR26_MA_2","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":2.1,"days":477,"est":"2027-08-20"},{"name":"Eternal Market Platinum Selection Kit","item_id":"platinum_selection_kit_LTE24A","have":0,"need":1000,"pct":0.0,"assembled":2,"in_progress":true,"complete":false,"fpd":3.15,"days":318,"est":"2027-03-14"},{"name":"Shrine of Knowledge Upgrade","item_id":"upgrade_kit_shrine_of_knowledge","have":0,"need":15,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.01,"days":1500,"est":"2030-06-08"},{"name":"Guild Expedition 1 Kit","item_id":"selection_kit_gex1","have":0,"need":100,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.31,"days":323,"est":"2027-03-19"},{"name":"One Up Kit","item_id":"one_up_kit","have":0,"need":30,"pct":0.0,"assembled":11,"in_progress":true,"complete":false,"fpd":0.47,"days":64,"est":"2026-07-03"},{"name":"Wishing Well Shrink Kit","item_id":"shrink_kit_wishing_well","have":0,"need":15,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.04,"days":375,"est":"2027-05-10"},{"name":"Store Building","item_id":"store_building","have":0,"need":15,"pct":0.0,"assembled":7,"in_progress":true,"complete":false,"fpd":0.1,"days":150,"est":"2026-09-27"},{"name":"Neo Bazaar Silver Selection Kit","item_id":"silver_selection_kit_GR25C","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.42,"days":2381,"est":"2032-11-05"},{"name":"Neo Bazaar Selection Kit","item_id":"selection_kit_GR25C","have":0,"need":1000,"pct":0.0,"assembled":6,"in_progress":true,"complete":false,"fpd":16.51,"days":61,"est":"2026-06-30"},{"name":"Guild Expedition 3 Kit","item_id":"selection_kit_gex3","have":0,"need":100,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.39,"days":257,"est":"2027-01-12"},{"name":"Renovation Kit","item_id":"renovation_kit","have":0,"need":30,"pct":0.0,"assembled":4,"in_progress":true,"complete":false,"fpd":0.58,"days":52,"est":"2026-06-21"},{"name":"Greater Ritual Flame","item_id":"building_greater_ritual_flame","have":0,"need":100,"pct":0.0,"assembled":4,"in_progress":false,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Neo Shrine of Knowledge Selection Kit","item_id":"selection_kit_GR25G","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":false,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Shajar al-Durr","item_id":"ally#shajar_al_durr#rare#1","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":false,"complete":false,"fpd":0.0,"days":null,"est":null}]}];
+const FRAGS=[{"tag":"CTHG","fragments":[{"name":"Neo Checkmate Square Selection Kit","item_id":"selection_kit_GR25A","have":900,"need":1000,"pct":90.0,"assembled":3,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Guild Expedition 2 Kit","item_id":"selection_kit_gex2","have":60,"need":100,"pct":60.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.31,"days":130,"est":"2026-09-07"},{"name":"Guild Expedition 4 Kit","item_id":"selection_kit_gex4","have":60,"need":100,"pct":60.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.31,"days":130,"est":"2026-09-07"},{"name":"Wishing Well","item_id":"building_wishing_well","have":6,"need":15,"pct":40.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.03,"days":300,"est":"2027-02-24"},{"name":"QI Autumn 2025 Epic Selection Kit","item_id":"selection_kit_epic_GR25_3","have":400,"need":1000,"pct":40.0,"assembled":0,"in_progress":true,"complete":false,"fpd":2.1,"days":286,"est":"2027-02-10"},{"name":"Feathered Serpent Statue Chain Kit","item_id":"selection_kit_feathered_serpent_statue_chain","have":30,"need":100,"pct":30.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.16,"days":438,"est":"2027-07-12"},{"name":"Feathered Serpent Statue Selection Kit","item_id":"selection_kit_feathered_serpent_statue","have":50,"need":200,"pct":25.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.26,"days":577,"est":"2027-11-28"},{"name":"Neo Bazaar Golden Selection Kit","item_id":"golden_selection_kit_GR25C","have":240,"need":1000,"pct":24.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Forgotten Temple - Active","item_id":"building_forgotten_temple","have":40,"need":200,"pct":20.0,"assembled":1,"in_progress":true,"complete":false,"fpd":1.26,"days":127,"est":"2026-09-04"},{"name":"Fountain of Youth","item_id":"building_fountain_of_youth","have":145,"need":800,"pct":18.1,"assembled":0,"in_progress":true,"complete":false,"fpd":0.76,"days":862,"est":"2028-09-08"},{"name":"Boo\u2019loon Grand Gala Golden Upgrade Kit","item_id":"golden_upgrade_kit_HAL25A","have":25,"need":150,"pct":16.7,"assembled":0,"in_progress":true,"complete":false,"fpd":0.13,"days":962,"est":"2028-12-17"},{"name":"Boo\u2019loon Masquerade Carnival Silver Upgrade Kit","item_id":"silver_upgrade_kit_HAL25A","have":25,"need":150,"pct":16.7,"assembled":0,"in_progress":true,"complete":false,"fpd":0.13,"days":962,"est":"2028-12-17"},{"name":"Intelligence Relay Selection Kit","item_id":"selection_kit_GBG26D","have":75,"need":500,"pct":15.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Divine Sky Watch","item_id":"building_divine_sky_watch","have":15,"need":120,"pct":12.5,"assembled":0,"in_progress":true,"complete":false,"fpd":0.08,"days":1313,"est":"2029-12-03"},{"name":"Neo Colossus Selection Kit","item_id":"selection_kit_neo_colossus","have":120,"need":1000,"pct":12.0,"assembled":0,"in_progress":true,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Fountain Of Youth Shrink Kit","item_id":"shrink_kit_fountain_of_youth","have":15,"need":800,"pct":1.9,"assembled":0,"in_progress":true,"complete":false,"fpd":0.08,"days":9813,"est":"2053-03-12"},{"name":"Shrine of Knowledge Upgrade","item_id":"upgrade_kit_shrine_of_knowledge","have":0,"need":15,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.01,"days":1500,"est":"2030-06-08"},{"name":"Store Building","item_id":"store_building","have":0,"need":15,"pct":0.0,"assembled":7,"in_progress":true,"complete":false,"fpd":0.1,"days":150,"est":"2026-09-27"},{"name":"Renovation Kit","item_id":"renovation_kit","have":0,"need":30,"pct":0.0,"assembled":4,"in_progress":true,"complete":false,"fpd":0.58,"days":52,"est":"2026-06-21"},{"name":"Wishing Well Shrink Kit","item_id":"shrink_kit_wishing_well","have":0,"need":15,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.04,"days":375,"est":"2027-05-10"},{"name":"QI 2026 Middle Ages Epic Selection Kit 2","item_id":"selection_kit_epic_GR26_MA_2","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":2.1,"days":477,"est":"2027-08-20"},{"name":"Neo Bazaar Silver Selection Kit","item_id":"silver_selection_kit_GR25C","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.42,"days":2381,"est":"2032-11-05"},{"name":"Neo Bazaar Selection Kit","item_id":"selection_kit_GR25C","have":0,"need":1000,"pct":0.0,"assembled":6,"in_progress":true,"complete":false,"fpd":16.51,"days":61,"est":"2026-06-30"},{"name":"Guild Expedition 3 Kit","item_id":"selection_kit_gex3","have":0,"need":100,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.39,"days":257,"est":"2027-01-12"},{"name":"One Up Kit","item_id":"one_up_kit","have":0,"need":30,"pct":0.0,"assembled":11,"in_progress":true,"complete":false,"fpd":0.47,"days":64,"est":"2026-07-03"},{"name":"Guild Expedition 1 Kit","item_id":"selection_kit_gex1","have":0,"need":100,"pct":0.0,"assembled":1,"in_progress":true,"complete":false,"fpd":0.31,"days":323,"est":"2027-03-19"},{"name":"Eternal Market Platinum Selection Kit","item_id":"platinum_selection_kit_LTE24A","have":0,"need":1000,"pct":0.0,"assembled":2,"in_progress":true,"complete":false,"fpd":3.15,"days":318,"est":"2027-03-14"},{"name":"Shajar al-Durr","item_id":"ally#shajar_al_durr#rare#1","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":false,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Neo Shrine of Knowledge Selection Kit","item_id":"selection_kit_GR25G","have":0,"need":1000,"pct":0.0,"assembled":1,"in_progress":false,"complete":false,"fpd":0.0,"days":null,"est":null},{"name":"Greater Ritual Flame","item_id":"building_greater_ritual_flame","have":0,"need":100,"pct":0.0,"assembled":4,"in_progress":false,"complete":false,"fpd":0.0,"days":null,"est":null}]}];
 let t4AP=FRAGS.length>0?FRAGS[0].tag:null;
 let t4SC='pct',t4SA=false;
 
