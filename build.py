@@ -214,6 +214,74 @@ def build_best_list(zip_paths):
     return rows, global_highest
 
 
+def find_boost_buildings_json(script_dir):
+    p = script_dir / "boost_buildings.json"
+    return p if p.exists() else None
+
+
+def augment_best_list_from_json(best_rows, highest_era_idx, json_path):
+    """Merge boost_buildings.json buildings into Tab 1 data."""
+    with open(json_path, encoding="utf-8") as f:
+        data = json.load(f)
+
+    existing_names = {r["n"].lower() for r in best_rows}
+    added = 0
+
+    for bid, b in data.items():
+        name = b.get("name", bid)
+        if name.lower() in existing_names:
+            continue
+        w  = b.get("width", 1)
+        lv = b.get("length", 1)
+
+        era_acc = {}
+        for ability in b.get("abilities", []):
+            for hint in ability.get("boostHints", []):
+                for era, boost in hint.get("boostHintEraMap", {}).items():
+                    if era not in ERA_RANK:
+                        continue
+                    feat = boost.get("targetedFeature", "all")
+                    bt   = boost.get("type", "")
+                    val  = boost.get("value", 0)
+                    if era not in era_acc:
+                        era_acc[era] = [0, 0, 0, 0]  # a, d, ga, gd
+                    is_gen = feat in GENERAL_FEATURES
+                    is_gbg = feat in GBG_FEATURES
+                    if bt in ATT_TYPES:
+                        if is_gen:   era_acc[era][0] += val
+                        elif is_gbg: era_acc[era][2] += val
+                    if bt in DEF_TYPES:
+                        if is_gen:   era_acc[era][1] += val
+                        elif is_gbg: era_acc[era][3] += val
+
+        era_rows = [
+            [ERA_RANK[era]] + vals
+            for era, vals in era_acc.items()
+            if any(v > 0 for v in vals)
+        ]
+        era_rows.sort(key=lambda x: x[0])
+        if not era_rows:
+            continue
+
+        hi = max(r[0] for r in era_rows)
+        if hi > highest_era_idx:
+            highest_era_idx = hi
+
+        best_rows.append({
+            "n": name, "id": bid,
+            "s": f"{w}×{lv}",
+            "t": w * lv,
+            "evt": None,
+            "e": era_rows,
+        })
+        existing_names.add(name.lower())
+        added += 1
+
+    print(f"  [Tab1] Added {added} buildings from boost_buildings.json "
+          f"({len(best_rows):,} total)")
+    return best_rows, highest_era_idx
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # TAB 2 — Battle Boost Reference
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -755,7 +823,8 @@ HTML_TEMPLATE = """\
   --text:#e2e8f0;--text2:#b8c4d4;--text3:#6b7e99;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-size:14px;
+html{font-size:18px;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-size:16px;
   background-image:radial-gradient(ellipse at 10% 0%,rgba(59,130,246,.08) 0%,transparent 40%),
   radial-gradient(ellipse at 90% 100%,rgba(20,184,166,.06) 0%,transparent 40%);}
 .app{max-width:1400px;margin:0 auto;padding:24px 20px 60px;}
@@ -1069,6 +1138,49 @@ tr:hover td{background:rgba(59,130,246,.04);}
 </table></div>
 </div>
 
+<!-- TAB 6 ────────────────────────────────────────────────────────────────────────────── -->
+<div id="t6" class="tab-panel">
+<div class="info-box">
+  <strong>All Boost Buildings</strong> — complete set of buildings with combat boost values.
+  Open World boosts only (AAA/DAA/ADA/DDA). Pick your era — values update instantly.
+  <strong>AAA</strong> = Att for Attacking Army &nbsp;|&nbsp; <strong>DAA</strong> = Def for Attacking Army &nbsp;|&nbsp;
+  <strong>ADA</strong> = Att for Defending Army &nbsp;|&nbsp; <strong>DDA</strong> = Def for Defending Army.
+</div>
+<div class="toolbar">
+  <input class="search-box" id="t6-search" placeholder="Search building…" oninput="t6Render()">
+  <div class="era-wrap">
+    <span class="era-label">ERA:</span>
+    <select class="ddl era-sel" id="t6-era" onchange="t6Render()">
+%%ERA_OPTIONS%%
+    </select>
+  </div>
+  <select class="ddl" id="t6-sort" onchange="t6Render()">
+    <option value="tot">Sort: Total</option>
+    <option value="pt">Sort: Per Tile</option>
+    <option value="aaa">Sort: AAA</option>
+    <option value="daa">Sort: DAA</option>
+    <option value="ada">Sort: ADA</option>
+    <option value="dda">Sort: DDA</option>
+    <option value="n">Sort: Name</option>
+  </select>
+  <span class="count-label" id="t6-count"></span>
+</div>
+<div class="table-wrap"><table>
+<thead><tr>
+  <th>#</th>
+  <th onclick="t6ColSort('n')">BUILDING</th>
+  <th onclick="t6ColSort('tot')">TOTAL ▾</th>
+  <th onclick="t6ColSort('pt')">PT</th>
+  <th onclick="t6ColSort('aaa')">AAA</th>
+  <th onclick="t6ColSort('daa')">DAA</th>
+  <th onclick="t6ColSort('ada')">ADA</th>
+  <th onclick="t6ColSort('dda')">DDA</th>
+  <th>SIZE</th>
+</tr></thead>
+<tbody id="t6-tbody"></tbody>
+</table></div>
+</div>
+
 <div class="footer">
   Data sourced from FoE Helper MegaExports \u2014 community reference only. Not affiliated with InnoGames.<br>
   Battle boost data curated by Wyldfyre. &mdash;
@@ -1332,6 +1444,9 @@ function t5ColSort(c){
 }
 t5Init();
 t5Render();
+
+}
+t6Render();
 </script>
 </body>
 </html>
@@ -1372,8 +1487,8 @@ def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
     best_json       = json.dumps(best_rows,    separators=(",", ":"), ensure_ascii=True)
     bb_json         = json.dumps(bb_rows,      separators=(",", ":"), ensure_ascii=True)
     frags_json      = json.dumps(frag_players, separators=(",", ":"), ensure_ascii=True)
-    friends_json    = json.dumps(friend_players, separators=(",", ":"), ensure_ascii=True)
-    era_order_json  = json.dumps(ERA_ORDER,    separators=(",", ":"))
+    friends_json     = json.dumps(friend_players, separators=(",", ":"), ensure_ascii=True)
+    era_order_json   = json.dumps(ERA_ORDER,    separators=(",", ":"))
     era_labels_json = json.dumps(ERA_LABELS,   separators=(",", ":"))
     gb_sections     = build_gb_sections(gb_players)
 
@@ -1391,9 +1506,9 @@ def build_html(best_rows, highest_era_idx, bb_rows, gb_players,
     html = html.replace("%%BEST_JSON%%",       best_json)
     html = html.replace("%%BB_JSON%%",         bb_json)
     html = html.replace("%%FRAGS_JSON%%",      frags_json)
-    html = html.replace("%%FRIENDS_JSON%%",    friends_json)
-    html = html.replace("%%INACTIVE_DAYS%%",   str(INACTIVE_DAYS))
-    html = html.replace("%%GB_SECTIONS%%",     gb_sections)
+    html = html.replace("%%FRIENDS_JSON%%",     friends_json)
+    html = html.replace("%%INACTIVE_DAYS%%",    str(INACTIVE_DAYS))
+    html = html.replace("%%GB_SECTIONS%%",      gb_sections)
     return html
 
 
@@ -1407,9 +1522,9 @@ def build_dashboard_html(best_rows, highest_era_idx, bb_rows,
     all_evts = sorted({b["evt"] for b in best_rows if b["evt"]})
     event_options = [f'    <option value="{e}">{e}</option>' for e in all_evts]
 
-    best_json       = json.dumps(best_rows, separators=(",", ":"), ensure_ascii=True)
-    bb_json         = json.dumps(bb_rows,   separators=(",", ":"), ensure_ascii=True)
-    era_order_json  = json.dumps(ERA_ORDER,  separators=(",", ":"))
+    best_json        = json.dumps(best_rows,   separators=(",", ":"), ensure_ascii=True)
+    bb_json          = json.dumps(bb_rows,     separators=(",", ":"), ensure_ascii=True)
+    era_order_json   = json.dumps(ERA_ORDER,   separators=(",", ":"))
     era_labels_json = json.dumps(ERA_LABELS, separators=(",", ":"))
 
     no_personal = (
@@ -1434,8 +1549,8 @@ def build_dashboard_html(best_rows, highest_era_idx, bb_rows,
     html = html.replace("%%BEST_JSON%%",       best_json)
     html = html.replace("%%BB_JSON%%",         bb_json)
     html = html.replace("%%FRAGS_JSON%%",      "[]")
-    html = html.replace("%%FRIENDS_JSON%%",    "[]")
-    html = html.replace("%%INACTIVE_DAYS%%",   str(INACTIVE_DAYS))
+    html = html.replace("%%FRIENDS_JSON%%",     "[]")
+    html = html.replace("%%INACTIVE_DAYS%%",    str(INACTIVE_DAYS))
     html = html.replace("%%GB_SECTIONS%%",     no_personal)
     return html
 
@@ -1443,6 +1558,21 @@ def build_dashboard_html(best_rows, highest_era_idx, bb_rows,
 # ═══════════════════════════════════════════════════════════════════════════════
 # Entry point
 # ═══════════════════════════════════════════════════════════════════════════════
+
+def _tag_of(zp):
+    m = re.match(r"([A-Z]+)_foe_helper", zp.name)
+    return m.group(1) if m else zp.stem
+
+
+def _latest_per_tag(zip_paths):
+    """Return one zip per player tag — the one with the latest filename sort order."""
+    best = {}
+    for zp in zip_paths:
+        tag = _tag_of(zp)
+        if tag not in best or zp.name > best[tag].name:
+            best[tag] = zp
+    return best
+
 
 def main():
     script_dir = Path(__file__).parent
@@ -1458,12 +1588,24 @@ def main():
         print("  Put MegaExport zips in exports/ or pass paths as arguments.")
         sys.exit(1)
 
+    # Tab 1 uses ALL zips (captures event buildings from past events).
+    # Tabs 3/4/5 use only the latest zip per player to avoid duplicates.
+    latest_by_tag = _latest_per_tag(zip_paths)
+    personal_zips = sorted(latest_by_tag.values(), key=lambda z: z.name)
+
     print(f"\nFoE Community INFO Builder")
     print('-'*44)
-    print(f"Processing {len(zip_paths)} export(s):\n")
+    print(f"Processing {len(zip_paths)} export(s) for Tab 1 "
+          f"({len(personal_zips)} latest for personal tabs):\n")
 
     # ── Shared data (all zips merged) ─────────────────────────────────────────
     best_rows, highest_era_idx = build_best_list(zip_paths)
+
+    boost_json_early = find_boost_buildings_json(script_dir)
+    if boost_json_early:
+        best_rows, highest_era_idx = augment_best_list_from_json(
+            best_rows, highest_era_idx, boost_json_early
+        )
 
     bb_csv  = find_battle_boost_csv(script_dir)
     bb_rows = []
@@ -1475,20 +1617,16 @@ def main():
         print(f"         Place *BattleBoost*.csv next to build.py.")
 
     print()
-    gb_players   = build_gb_data(zip_paths)
+    gb_players   = build_gb_data(personal_zips)
     print()
-    frag_players = build_fragment_data(zip_paths)
+    frag_players = build_fragment_data(personal_zips)
     print()
-    friend_players = build_friend_data(zip_paths)
+    friend_players = build_friend_data(personal_zips)
 
-    # Tag each zip with its player name
-    tagged_zips = []
-    for zp in zip_paths:
-        m = re.match(r"([A-Z]+)_foe_helper", zp.name)
-        tag = m.group(1) if m else zp.stem
-        tagged_zips.append((tag, zp))
+    # One entry per unique player tag (latest zip wins)
+    tagged_zips = [(tag, zp) for tag, zp in sorted(latest_by_tag.items())]
 
-    sources    = [tag for tag, _ in tagged_zips]
+    sources = [tag for tag, _ in tagged_zips]
     # Build nav links — Dashboard + all personal pages
     def make_nav_links(active_tag=None):
         links = []
