@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoE Community INFO — Friend Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0d1220;--bg3:#111827;--panel:#0f1825;
+  --border:#1e2d45;--border2:#263650;
+  --gold:#f0b429;--blue:#3b82f6;--blue2:#7dd3fc;
+  --teal:#14b8a6;--green:#22c55e;--red:#ef4444;
+  --text:#e2e8f0;--text2:#b8c4d4;--text3:#6b7e99;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-size:16px;line-height:1.7;
+  background-image:radial-gradient(ellipse at 10% 0%,rgba(59,130,246,.08) 0%,transparent 40%),
+  radial-gradient(ellipse at 90% 100%,rgba(20,184,166,.06) 0%,transparent 40%);}
+.app{max-width:860px;margin:0 auto;padding:32px 20px 60px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--teal);text-decoration:none;
+  font-family:'Share Tech Mono',monospace;font-size:.78rem;margin-bottom:28px;
+  border:1px solid rgba(20,184,166,.3);border-radius:6px;padding:5px 12px;transition:all .15s;}
+.back:hover{background:rgba(20,184,166,.08);color:var(--text);}
+h1{font-family:'Rajdhani',sans-serif;font-size:1.9rem;font-weight:700;letter-spacing:.06em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+.subtitle{color:var(--text2);font-size:.9rem;margin-bottom:32px;}
+.section{background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:20px 24px;margin-bottom:16px;}
+.section h2{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:600;
+  color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;
+  border-bottom:1px solid var(--border);padding-bottom:8px;}
+.section p{color:var(--text2);font-size:.88rem;margin-bottom:10px;}
+.section p:last-child{margin-bottom:0;}
+.section ul{color:var(--text2);font-size:.88rem;padding-left:18px;}
+.section ul li{margin-bottom:6px;}
+.col-table{width:100%;border-collapse:collapse;margin-top:8px;}
+.col-table th{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.08em;
+  color:var(--text3);padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);
+  background:var(--bg3);}
+.col-table td{padding:7px 10px;border-bottom:1px solid rgba(30,45,69,.4);font-size:.83rem;color:var(--text2);}
+.col-table td:first-child{font-family:'Share Tech Mono',monospace;color:var(--gold);font-size:.78rem;white-space:nowrap;}
+.col-table tr:last-child td{border-bottom:none;}
+.status-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
+.status-pill{border-radius:20px;padding:5px 16px;font-family:'Share Tech Mono',monospace;
+  font-size:.76rem;border:1px solid;}
+.s-active{color:var(--green);border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.07);}
+.s-inactive{color:var(--red);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.07);}
+.s-new{color:var(--teal);border-color:rgba(20,184,166,.3);background:rgba(20,184,166,.07);}
+.tip{background:rgba(20,184,166,.07);border:1px solid rgba(20,184,166,.25);border-left:3px solid var(--teal);
+  border-radius:6px;padding:12px 16px;margin-top:12px;font-size:.83rem;color:var(--text2);}
+.tip strong{color:var(--text);}
+</style>
+</head>
+<body>
+<div class="app">
+  <a class="back" href="index.html">&#8592; Back to Dashboard</a>
+  <h1>&#128101; Friend Manager</h1>
+  <p class="subtitle">Tab 5 — Friends list with activity status, last-aided dates, and days since login</p>
+
+  <div class="section">
+    <h2>What it does</h2>
+    <p>Tracks your friends list — who's active, who's gone quiet, when you last aided each friend, and how long they've been in your friends list. The main use is spotting inactive players to replace and maintaining reciprocal aiding habits.</p>
+  </div>
+
+  <div class="section">
+    <h2>What you'll see</h2>
+    <ul>
+      <li>One section per player (one section = one MegaExport zip).</li>
+      <li>Each row is one friend on that player's list.</li>
+      <li>Sort by <strong>Days Since</strong> to surface the most inactive friends at a glance.</li>
+      <li>Search by name or filter to Active / Inactive / New using the dropdowns.</li>
+      <li>Count at the top shows total friends and how many are inactive.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Column guide</h2>
+    <table class="col-table">
+      <thead><tr><th>Column</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>Friend</td><td>In-game name</td></tr>
+        <tr><td>Friend Since</td><td>Date you became friends</td></tr>
+        <tr><td>Last Aided</td><td>Date you last aided this friend</td></tr>
+        <tr><td>Days Since</td><td>Days since this friend last logged in to FoE</td></tr>
+        <tr><td>Status</td><td>Active / Inactive / New (see below)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Status labels</h2>
+    <div class="status-row">
+      <span class="status-pill s-active">Active</span>
+      <span class="status-pill s-inactive">Inactive</span>
+      <span class="status-pill s-new">New</span>
+    </div>
+    <p style="margin-top:12px;">
+      <strong style="color:var(--green)">Active</strong> — logged in recently.<br>
+      <strong style="color:var(--red)">Inactive</strong> — hasn't logged in for an extended period. These are the friends worth reviewing for replacement.<br>
+      <strong style="color:var(--teal)">New</strong> — recently added friend, not yet established.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>Data source &amp; updates</h2>
+    <p>Pulled from the <code>friends</code> section of each player's FoE Helper MegaExport zip.</p>
+    <p>Updated every Thursday when players run <code>./update.sh</code>.</p>
+    <div class="tip">
+      <strong>Days Since is a snapshot.</strong> The value reflects the friend's last login as recorded at the time of the export — it doesn't update in real time. A friend who logged in after the last export will still show their old "days since" count until the next update.
+    </div>
+  </div>
+</div>
+</body>
+</html>

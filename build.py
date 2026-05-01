@@ -839,12 +839,17 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-
 .badge.teal{color:var(--teal);border-color:rgba(20,184,166,.3);}
 .badge.green{color:var(--green);border-color:rgba(34,197,94,.3);}
 .badge.blue{color:var(--blue2);border-color:rgba(125,211,252,.3);}
-.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto;}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto;align-items:center;}
 .tab-btn{background:none;border:none;padding:14px 24px;font-family:'Exo 2',sans-serif;
   font-size:.88rem;font-weight:500;color:var(--text3);cursor:pointer;white-space:nowrap;
   border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;}
 .tab-btn:hover{color:var(--text2);}
 .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.help-btn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;
+  border-radius:50%;border:1px solid rgba(240,180,41,.4);color:var(--gold);font-size:.65rem;
+  font-weight:700;text-decoration:none;font-family:'Share Tech Mono',monospace;
+  margin:0 10px 0 2px;flex-shrink:0;opacity:.6;transition:all .15s;}
+.help-btn:hover{opacity:1;background:rgba(240,180,41,.12);}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
 .info-box{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--teal);
@@ -940,10 +945,15 @@ tr:hover td{background:rgba(59,130,246,.04);}
 
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('t1',this)">&#9876; Boost Reference</button>
+  <a class="help-btn" href="help-t1.html" target="_blank" title="About: Boost Reference">?</a>
   <button class="tab-btn" onclick="switchTab('t2',this)">&#9876; Battle Boosts</button>
+  <a class="help-btn" href="help-t2.html" target="_blank" title="About: Battle Boosts">?</a>
   <button class="tab-btn" onclick="switchTab('t3',this)">&#127963; GB Planner</button>
+  <a class="help-btn" href="help-t3.html" target="_blank" title="About: GB Planner">?</a>
   <button class="tab-btn" onclick="switchTab('t4',this)">&#129512; Fragment Tracker</button>
+  <a class="help-btn" href="help-t4.html" target="_blank" title="About: Fragment Tracker">?</a>
   <button class="tab-btn" onclick="switchTab('t5',this)">&#128101; Friend Manager</button>
+  <a class="help-btn" href="help-t5.html" target="_blank" title="About: Friend Manager">?</a>
 </div>
 
 <!-- TAB 1 ─────────────────────────────────────────────────────────────────── -->
