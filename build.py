@@ -1411,9 +1411,6 @@ function t5ColSort(c){
 }
 t5Init();
 t5Render();
-
-}
-t6Render();
 </script>
 </body>
 </html>
