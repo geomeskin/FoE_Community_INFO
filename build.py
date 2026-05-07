@@ -87,6 +87,7 @@ EVENT_MAP = {
     "GEX":  "Guild Expedition",
     "LTE":  "Age Bonus",
     "SPR":  "Spring Event",
+    "VIK":  "Viking Event",
 }
 
 GENERAL_FEATURES = {"all", "guild_expedition", "guild_raids"}
@@ -187,7 +188,7 @@ def extract_from_zip(zip_path):
                     continue
                 buildings[bid] = {
                     "name": j["name"], "w": w, "h": h,
-                    "evt": evt, "e": era_rows,
+                    "evt": evt, "e": era_rows, "da": None,
                 }
     return buildings, highest_era_idx
 
@@ -217,6 +218,50 @@ def build_best_list(zip_paths):
 def find_boost_buildings_json(script_dir):
     p = script_dir / "boost_buildings.json"
     return p if p.exists() else None
+
+
+def load_building_dates(script_dir):
+    """Load the persistent building first-seen dates registry."""
+    p = script_dir / "building_dates.json"
+    if p.exists():
+        try:
+            with open(p, encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+
+def save_building_dates(script_dir, dates):
+    """Save the building first-seen dates registry."""
+    p = script_dir / "building_dates.json"
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump(dates, f, indent=2, sort_keys=True)
+
+
+def stamp_building_dates(script_dir, best_rows):
+    """
+    For each building row, look up or assign a date_added.
+    New buildings get today's date. Existing ones keep their original date.
+    Returns updated best_rows with 'da' field added.
+    """
+    dates = load_building_dates(script_dir)
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    new_count = 0
+
+    for row in best_rows:
+        bid = row.get("id", row.get("n", ""))
+        if bid not in dates:
+            dates[bid] = today
+            new_count += 1
+        row["da"] = dates[bid]
+
+    save_building_dates(script_dir, dates)
+    if new_count:
+        print(f"  [Tab1] {new_count} new building(s) stamped with date {today}")
+    else:
+        print(f"  [Tab1] No new buildings detected")
+    return best_rows
 
 
 def augment_best_list_from_json(best_rows, highest_era_idx, json_path):
@@ -273,6 +318,7 @@ def augment_best_list_from_json(best_rows, highest_era_idx, json_path):
             "t": w * lv,
             "evt": None,
             "e": era_rows,
+            "da": None,
         })
         existing_names.add(name.lower())
         added += 1
@@ -716,30 +762,42 @@ def extract_friend_data(zip_path):
     if not events:
         return None
 
-    friends = {}  # playerid -> {name, friend_since, last_aided}
-
+    # Collect full event history per player, then use most recent event's
+    # isfriend value to determine current status. This filters out ex-friends
+    # whose last recorded event is friendship_ended (isfriend=0), while keeping
+    # friends whose most recent interaction still shows isfriend=1.
+    player_history = {}
     for e in events:
-        pid   = e.get("playerid")
-        pname = e.get("playername", "Unknown")
-        date  = e.get("date", 0)
-        etype = e.get("eventtype", "")
-        if not pid or not e.get("isfriend"):
+        pid = e.get("playerid")
+        if not pid:
             continue
+        if pid not in player_history:
+            player_history[pid] = []
+        player_history[pid].append(e)
 
-        if pid not in friends:
-            friends[pid] = {"name": pname, "friend_since": None, "last_aided": None}
+    friends = {}
+    for pid, ev_list in player_history.items():
+        ev_list.sort(key=lambda x: x.get("date", 0))
+        if not ev_list[-1].get("isfriend"):
+            continue  # Most recent event shows no longer a friend
 
-        friends[pid]["name"] = pname
-
-        if etype == "friend_accepted":
-            fs = friends[pid]["friend_since"]
-            if fs is None or date < fs:
-                friends[pid]["friend_since"] = date
-
-        elif etype == "social_interaction":
-            la = friends[pid]["last_aided"]
-            if la is None or date > la:
-                friends[pid]["last_aided"] = date
+        friends[pid] = {"name": ev_list[-1].get("playername", "Unknown"),
+                        "friend_since": None, "last_aided": None}
+        for e in ev_list:
+            if not e.get("isfriend"):
+                continue
+            pname = e.get("playername", "Unknown")
+            date  = e.get("date", 0)
+            etype = e.get("eventtype", "")
+            friends[pid]["name"] = pname
+            if etype == "friend_accepted":
+                fs = friends[pid]["friend_since"]
+                if fs is None or date < fs:
+                    friends[pid]["friend_since"] = date
+            elif etype == "social_interaction":
+                la = friends[pid]["last_aided"]
+                if la is None or date > la:
+                    friends[pid]["last_aided"] = date
 
     if not friends:
         return None
@@ -794,7 +852,7 @@ def extract_friend_data(zip_path):
     tag = m.group(1) if m else zip_path.stem
 
     inactive = sum(1 for r in friend_rows if r["status"] == "inactive")
-    print(f"  [Tab5] {tag}: {len(friend_rows)} friends "
+    print(f"  [Tab5] {tag}: {len(friend_rows)} in history "
           f"({inactive} inactive, threshold={INACTIVE_DAYS}d)")
 
     return {"tag": tag, "friends": friend_rows, "inactive_days": INACTIVE_DAYS}
@@ -927,6 +985,9 @@ tr:hover td{background:rgba(59,130,246,.04);}
 .footer{text-align:center;padding-top:36px;color:var(--text3);font-size:.78rem;
   border-top:1px solid var(--border);margin-top:40px;}
 .footer a{color:var(--teal);text-decoration:none;}
+.new-badge{display:inline-block;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.4);
+  color:var(--green);border-radius:3px;padding:0 5px;font-size:.62rem;font-family:'Share Tech Mono',monospace;
+  margin-left:5px;vertical-align:middle;letter-spacing:.05em;}
 </style>
 </head>
 <body>
@@ -952,8 +1013,8 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <a class="help-btn" href="help-t3.html" target="_blank" title="About: GB Planner">?</a>
   <button class="tab-btn" onclick="switchTab('t4',this)">&#129512; Fragment Tracker</button>
   <a class="help-btn" href="help-t4.html" target="_blank" title="About: Fragment Tracker">?</a>
-  <button class="tab-btn" onclick="switchTab('t5',this)">&#128101; Friend Manager</button>
-  <a class="help-btn" href="help-t5.html" target="_blank" title="About: Friend Manager">?</a>
+  <button class="tab-btn" onclick="switchTab('t5',this)">&#128101; Friend History</button>
+  <a class="help-btn" href="help-t5.html" target="_blank" title="About: Friend History">?</a>
 </div>
 
 <!-- TAB 1 ─────────────────────────────────────────────────────────────────── -->
@@ -977,6 +1038,7 @@ tr:hover td{background:rgba(59,130,246,.04);}
     <option value="event">Event buildings</option>
     <option value="gbg">GbG boost only</option>
     <option value="ge">Guild Expedition</option>
+    <option value="new">&#127381; New this month</option>
   </select>
   <select class="ddl" id="t1-fevt" onchange="t1Render()">
     <option value="">All events</option>
@@ -1006,6 +1068,7 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <th onclick="t1ColSort('gd')">GBG DEF%</th>
   <th>SIZE</th>
   <th onclick="t1ColSort('evt')">EVENT</th>
+  <th onclick="t1ColSort('da')">ADDED</th>
 </tr></thead>
 <tbody id="t1-tbody"></tbody>
 </table></div>
@@ -1119,11 +1182,16 @@ tr:hover td{background:rgba(59,130,246,.04);}
 <!-- TAB 5 ────────────────────────────────────────────────────────────────────────────── -->
 <div id="t5" class="tab-panel">
 <div class="info-box">
-  <strong>Friend Manager</strong> — shows all friends seen in your event history.
+  <strong>Friend History</strong> — players seen as friends in your FoE Helper event log.
   <strong>Aided</strong> = any social interaction (motivate, polish, or polivate attempt).
   Friends flagged <span style="color:var(--red)">Inactive</span> have not aided in %%INACTIVE_DAYS%% days and are candidates to drop.
   Friends flagged <span style="color:var(--teal)">New</span> were added within the last %%INACTIVE_DAYS%% days — give them time.
-  Friends with no recorded aid may predate your FoE Helper history.
+</div>
+<div class="info-box" style="border-left-color:var(--orange);margin-top:8px;">
+  <strong>&#9888; Counts may exceed your in-game friend cap (140).</strong>
+  The export only records friendship changes that FoE Helper witnessed — silent removals
+  (friends who left on their own, or removals before FoE Helper was active) remain in this
+  history indefinitely. Use this list as a guide for inactivity, not an exact roster.
 </div>
 <div class="player-pills" id="t5-pills"></div>
 <div class="toolbar">
@@ -1182,16 +1250,20 @@ function t1Render(){
   const ft=document.getElementById('t1-ftype').value;
   const fe=document.getElementById('t1-fevt').value;
   t1SC=document.getElementById('t1-sort').value;
+  const now=new Date();
+  const thirtyDaysAgo=new Date(now-30*86400*1000).toISOString().slice(0,10);
   let rows=BEST.map(b=>{
     const bst=getBoosts(b,ei);
     const a=bst?bst.a:0,d=bst?bst.d:0,ga=bst?bst.ga:0,gd=bst?bst.gd:0,tot=a+d+ga+gd;
-    return{...b,a,d,ga,gd,tot,pt:tot>0?+(tot/b.t).toFixed(1):0,hd:!!bst};
+    const isNew=b.da&&b.da>=thirtyDaysAgo;
+    return{...b,a,d,ga,gd,tot,pt:tot>0?+(tot/b.t).toFixed(1):0,hd:!!bst,isNew};
   });
   rows=rows.filter(b=>{
     if(srch&&!b.n.toLowerCase().includes(srch))return false;
     if(ft==='event'&&!b.evt)return false;
     if(ft==='gbg'&&b.ga===0&&b.gd===0)return false;
     if(ft==='ge'&&!(b.evt||'').includes('Guild Expedition'))return false;
+    if(ft==='new'&&!b.isNew)return false;
     if(fe&&b.evt!==fe)return false;
     return true;
   });
@@ -1206,13 +1278,15 @@ function t1Render(){
     const rk=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
     const tc=b.hd?'<span class="v v-gold">'+b.tot.toLocaleString()+'</span>':'<span class="no-data">no era data</span>';
     const pc=b.hd&&b.pt>0?'<span class="v v-gold">'+b.pt+'</span>':'<span class="zero">\u2014</span>';
+    const newBadge=b.isNew?'<span class="new-badge">&#x1F195; NEW</span>':'';
     return'<tr><td class="rank '+rk+'">'+(i+1)+'</td>'
-      +'<td class="bn">'+b.n+'<span class="sb">'+b.s+'</span></td>'
+      +'<td class="bn">'+b.n+newBadge+'<span class="sb">'+b.s+'</span></td>'
       +'<td>'+tc+'</td><td>'+pc+'</td>'
       +'<td>'+fv(b.a,'v-att')+'</td><td>'+fv(b.d,'v-def')+'</td>'
       +'<td>'+fv(b.ga,'v-gbg')+'</td><td>'+fv(b.gd,'v-gbg')+'</td>'
       +'<td><span class="sb">'+b.s+'='+b.t+'t</span></td>'
-      +'<td><span class="evt-tag">'+(b.evt||'\u2014')+'</span></td></tr>';
+      +'<td><span class="evt-tag">'+(b.evt||'\u2014')+'</span></td>'
+      +'<td>'+(b.da?'<span class="sb">'+b.da+'</span>':'<span class="zero">\u2014</span>')+'</td></tr>';
   }).join('');
 }
 function t1ColSort(c){
@@ -1570,6 +1644,8 @@ def main():
         best_rows, highest_era_idx = augment_best_list_from_json(
             best_rows, highest_era_idx, boost_json_early
         )
+
+    best_rows = stamp_building_dates(script_dir, best_rows)
 
     bb_csv  = find_battle_boost_csv(script_dir)
     bb_rows = []
