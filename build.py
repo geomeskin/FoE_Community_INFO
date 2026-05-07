@@ -1251,7 +1251,7 @@ function t1Render(){
   const fe=document.getElementById('t1-fevt').value;
   t1SC=document.getElementById('t1-sort').value;
   const now=new Date();
-  const thirtyDaysAgo=new Date(now-30*86400*1000).toISOString().slice(0,10);
+  const thirtyDaysAgo=new Date(now-7*86400*1000).toISOString().slice(0,10);
   let rows=BEST.map(b=>{
     const bst=getBoosts(b,ei);
     const a=bst?bst.a:0,d=bst?bst.d:0,ga=bst?bst.ga:0,gd=bst?bst.gd:0,tot=a+d+ga+gd;
