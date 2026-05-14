@@ -133,7 +133,7 @@ tr:hover td{background:rgba(59,130,246,.04);}
   <div class="badges">
     <span class="badge gold">805 Buildings</span>
     <span class="badge teal">22 Eras</span>
-    <span class="badge green">Updated 7 May 2026</span>
+    <span class="badge green">Updated 14 May 2026</span>
     <span class="badge blue"><a href="index.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Dashboard</a> + <a href="CTHG.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">CTHG</a> + <a href="PMTHS.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">PMTHS</a> + <a href="RAHANNA.html" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">RAHANNA</a></span>
   </div>
 </div>
@@ -469,11 +469,11 @@ function t1Render(){
   const fe=document.getElementById('t1-fevt').value;
   t1SC=document.getElementById('t1-sort').value;
   const now=new Date();
-  const thirtyDaysAgo=new Date(now-7*86400*1000).toISOString().slice(0,10);
+  const sevenDaysAgo=new Date(now-7*86400*1000).toISOString().slice(0,10);
   let rows=BEST.map(b=>{
     const bst=getBoosts(b,ei);
     const a=bst?bst.a:0,d=bst?bst.d:0,ga=bst?bst.ga:0,gd=bst?bst.gd:0,tot=a+d+ga+gd;
-    const isNew=b.da&&b.da>=thirtyDaysAgo;
+    const isNew=b.da&&b.da>=sevenDaysAgo;
     return{...b,a,d,ga,gd,tot,pt:tot>0?+(tot/b.t).toFixed(1):0,hd:!!bst,isNew};
   });
   rows=rows.filter(b=>{
